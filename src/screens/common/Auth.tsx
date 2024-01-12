@@ -1,4 +1,3 @@
-import React from "react";
 import CabbyNav from "../../components/user/CabbyNav";
 import google from "../../assets/Icon google.svg";
 
