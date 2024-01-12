@@ -9,7 +9,8 @@ export default {
       colors:{
         "primary":"#BE3455",
         "secondary":"#D4CACD",
-        "hover":"#EEEEEE"
+        "hover":"#EEEEEE",
+        "text-secondary":"#6B6B6B"
       }
     },
   },
