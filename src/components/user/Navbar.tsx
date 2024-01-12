@@ -67,9 +67,11 @@ const Navbar = () => {
         <button className="rounded-full px-5 py-2 hover:bg-secondary">
           Login
         </button>
-        <button className="bg-secondary rounded-full px-5 py-2 text-primary hover:bg-hover">
+        <Link to='/signup'>
+         <button className="bg-secondary rounded-full px-5 py-2 text-primary hover:bg-hover">
           signup
         </button>
+        </Link>
         <div className=" md:hidden cursor-pointer me-3 ">
           {isOpen ? (
             <X onClick={toggleMenu} />
