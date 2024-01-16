@@ -1,5 +1,3 @@
-import React from 'react'
-import mapboxgl from 'mapbox-gl'; 
 
 const Ride = () => {
   return (

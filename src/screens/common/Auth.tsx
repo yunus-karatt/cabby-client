@@ -6,21 +6,20 @@ import {
   signInWithPhoneNumber,
 } from "firebase/auth";
 import { auth } from "../../services/firebase/config";
-import { AxiosData, CustomWindow } from "../../interface/common/common";
+import {  CustomWindow } from "../../interface/common/common";
 import OtpInputGroup from "../../components/auth/OtpInputGroup";
 import MobileInput from "../../components/auth/MobileInput";
 import { userAxios } from "../../constraints/axios/userAxios";
 import userApi from "../../constraints/api/userApi";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../services/redux/slices/userAuthSlice";
-import { AxiosResponse } from "axios";
 import { ExistingUser } from "../../interface/user/userInterface";
 
 const AuthPage = () => {
   let existingUser:ExistingUser|null;
   const [number, setNumber] = useState("+919995868047");
   const [user, setUser] = useState<ConfirmationResult | null>(null);
-  const [axiosData, setAxiosData] = useState<AxiosData|null>(null);
+  // const [axiosData, setAxiosData] = useState<AxiosData|null>(null);
 
   const dispatch=useDispatch()
 
@@ -58,7 +57,7 @@ const AuthPage = () => {
       existingUser=response.data
       dispatch(setCredentials(existingUser))
     }
-    setAxiosData(existingUser)
+    // setAxiosData(existingUser)
     sendOtp();
   };
 
