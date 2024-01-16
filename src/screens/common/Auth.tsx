@@ -11,12 +11,18 @@ import OtpInputGroup from "../../components/auth/OtpInputGroup";
 import MobileInput from "../../components/auth/MobileInput";
 import { userAxios } from "../../constraints/axios/userAxios";
 import userApi from "../../constraints/api/userApi";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../../services/redux/slices/userAuthSlice";
+import { AxiosResponse } from "axios";
+import { ExistingUser } from "../../interface/user/userInterface";
 
 const AuthPage = () => {
-  let existingUser;
-  const [number, setNumber] = useState("+91");
+  let existingUser:ExistingUser|null;
+  const [number, setNumber] = useState("+919995868047");
   const [user, setUser] = useState<ConfirmationResult | null>(null);
   const [axiosData, setAxiosData] = useState<AxiosData|null>(null);
+
+  const dispatch=useDispatch()
 
   const sendOtp = () => {
     try {
@@ -47,8 +53,12 @@ const AuthPage = () => {
     setNumber(e.target.value);
 
   const handleSubmit = async () => {
-    existingUser = await userAxios.post(userApi.userexist, { number });
-    setAxiosData(existingUser.data)
+    const response  = await userAxios.post(userApi.userexist, { number });
+    if(response.data){
+      existingUser=response.data
+      dispatch(setCredentials(existingUser))
+    }
+    setAxiosData(existingUser)
     sendOtp();
   };
 
@@ -57,7 +67,7 @@ const AuthPage = () => {
       <CabbyNav />
       <div className="bg-secondary h-lvh flex justify-center items-center">
         {user ? (
-          <OtpInputGroup user={axiosData} number={number}/>
+          <OtpInputGroup  number={number}/>
         ) : (
           <MobileInput
             onChange={handleChange}

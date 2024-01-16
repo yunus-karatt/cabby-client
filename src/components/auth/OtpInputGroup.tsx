@@ -1,13 +1,15 @@
 import { useState } from "react";
 import AuthFooter from "../user/AuthFooter";
 import OtpInput from "./OtpInput";
-import { AxiosData, CustomWindow } from "../../interface/common/common";
+import { CustomWindow } from "../../interface/common/common";
 import { useNavigate } from "react-router";
+import { useSelector } from "react-redux";
+import { rootState } from "../../interface/user/userInterface";
 
-const OtpInputGroup = ({user,number}:{user:AxiosData | null,number:string}) => {
+const OtpInputGroup = ({ number }: { number: string }) => {
+  const { userInfo } = useSelector((state: rootState) => state.userAuth);
+  const navigate = useNavigate();
 
-  const navigate=useNavigate()
-  
   const [inputValues, setInputValues] = useState({
     input1: "",
     input2: "",
@@ -33,19 +35,17 @@ const OtpInputGroup = ({user,number}:{user:AxiosData | null,number:string}) => {
       inputValues.input5 +
       inputValues.input6;
 
-    
-      const customWindow = window as CustomWindow;
-      if(customWindow.confirmationResult){
-        console.log({user})
-        customWindow.confirmationResult
+    const customWindow = window as CustomWindow;
+    if (customWindow.confirmationResult) {
+      customWindow.confirmationResult
         .confirm(otp)
         .then(() => {
           // User signed in successfully.
           // const user = result.user;
-          if(!user){
-            navigate('/signup',{state:number})
-          }else{
-            navigate('/')
+          if (!userInfo) {
+            navigate("/signup", { state: number });
+          } else {
+            navigate("/");
           }
           // ...
         })
@@ -54,8 +54,7 @@ const OtpInputGroup = ({user,number}:{user:AxiosData | null,number:string}) => {
           // ...
           console.log(error);
         });
-      }
-    
+    }
   };
 
   return (
@@ -64,7 +63,11 @@ const OtpInputGroup = ({user,number}:{user:AxiosData | null,number:string}) => {
       data-autosubmit="true"
       className="h-3/4 w-[360px] border-2 border-white rounded-lg p-4 mt-8  flex flex-col"
     >
-      <p className="text-2xl font-bold my-5">Welcome,</p>
+      <p className="text-2xl font-bold my-5">
+        {userInfo
+          ? `Welcome back ${userInfo.firstName} ${userInfo.lastName},`
+          : "Welcome "}
+      </p>
       <p className="text-2xl font-normal">
         Enter the 4 digit code sent to you{" "}
       </p>
