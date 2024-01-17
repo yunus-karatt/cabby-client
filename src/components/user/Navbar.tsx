@@ -1,10 +1,13 @@
 import { AlignJustify, ArrowRight, ChevronDown, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { rootState } from "../../interface/user/userInterface";
+import { userAxios } from "../../constraints/axios/userAxios";
+import userApi from "../../constraints/api/userApi";
+import { logout } from "../../services/redux/slices/userAuthSlice";
 
 const Navbar = () => {
   const isMediumScreen = useMediaQuery({ minWidth: 768 });
@@ -13,11 +16,24 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [manageProfile, setManageProfile] = useState(false);
 
+  const dispatch = useDispatch();
+  const navigate=useNavigate();
+  
   const toggleMenu = () => {
     setIsOpen((open) => !open);
   };
   const toggleProfile = () => {
     setManageProfile((open) => !open);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await userAxios.post(userApi.logout);
+      dispatch(logout());
+      navigate('/')
+    } catch (error) {
+      console.log(error);
+    }
   };
   useEffect(() => {
     if (isMediumScreen) {
@@ -36,7 +52,7 @@ const Navbar = () => {
             Cabby
           </Link>
         </div>
-        <div className="flex gap-6 mx-2 md:mx-4 p-2 justify-center items-center relative">
+        <div className="flex gap-6 mx-2 md:mx-4 p-2 justify-center items-center ">
           <div
             className={`${
               isOpen &&
@@ -84,11 +100,17 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <button className="rounded-full px-5 py-2 hover:bg-secondary " onClick={toggleProfile}>
+              <button
+                className="rounded-full px-5 py-2 hover:bg-secondary "
+                onClick={toggleProfile}
+              >
                 Login
               </button>
 
-              <button className="bg-secondary rounded-full px-5 py-2 text-primary hover:bg-hover" onClick={toggleProfile}>
+              <button
+                className="bg-secondary rounded-full px-5 py-2 text-primary hover:bg-hover"
+                onClick={toggleProfile}
+              >
                 signup
               </button>
             </>
@@ -110,19 +132,30 @@ const Navbar = () => {
           <div className="flex justify-center w-full h-full">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 justify-evenly items-center h-2/4">
               <div className="flex items-center border-b-2 border-black hover:border-primary hover:text-primary p-5">
-                <h2 className=" me-5 "><Link to="/authland">Ride With Cabby</Link></h2>
+                <h2 className=" me-5 ">
+                  <Link to="/authland">Ride With Cabby</Link>
+                </h2>
                 <ArrowRight />
               </div>
               <div className="flex items-center border-b-2 border-black hover:border-primary hover:text-primary p-5">
                 <h2 className=" me-5 ">Drive With Cabby</h2>
                 <ArrowRight />
               </div>
-              {userInfo &&
-              <div className="flex items-center border-b-2 border-black hover:border-primary hover:text-primary p-5">
-                <h2 className=" me-5 ">Manage Account</h2>
-                <ArrowRight />
-              </div>
-              }
+              {userInfo && (
+                <>
+                  <div className="flex items-center border-b-2 border-black hover:border-primary hover:text-primary p-5">
+                    <h2 className=" me-5 ">Manage Account</h2>
+                    <ArrowRight />
+                  </div>
+                  <div
+                    onClick={handleLogout}
+                    className="flex items-center border-b-2 border-black hover:border-primary hover:text-primary p-5"
+                  >
+                    <h2 className=" me-5 ">Logout</h2>
+                    <ArrowRight />
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

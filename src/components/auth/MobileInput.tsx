@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
-import google from "../../assets/Icon google.svg";
 import AuthFooter from "../user/AuthFooter";
 import { MobileInputProps } from "../../interface/common/common";
+import Oauth from "./Oauth";
 
 const MobileInput = ({ number, onChange, handleSubmit }:MobileInputProps) => {
   
@@ -33,9 +33,7 @@ const MobileInput = ({ number, onChange, handleSubmit }:MobileInputProps) => {
         </button>
       </div>
       <hr className="w-full border-black my-6" />
-      <button className="w-full bg-white rounded-lg p-3 flex items-center justify-center gap-6">
-        <img src={google} alt="" /> Continue with Google
-      </button>
+      <Oauth />
       <AuthFooter />
     </div>
   );

@@ -3,8 +3,9 @@ import { Route, Routes } from "react-router";
 import About from "../../screens/user/About";
 import Help from "../../screens/user/Help";
 import Home from "../../screens/user/Home";
-import Auth from "../../screens/common/Auth";
+import Auth from "../../screens/user/Auth";
 import Signup from "../../screens/user/Signup";
+import PageNotFound from "../../components/common/PageNotFound";
 
 const UserRoutes: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ const UserRoutes: React.FC = () => {
       <Route path="/help" element={<Help />} />
       <Route path="/authland" element={<Auth />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/*" element={<PageNotFound />} />
     </Routes>
   );
 };

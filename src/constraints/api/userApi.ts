@@ -1,4 +1,7 @@
 export default{
-  userexist:'/api/userexist',
-  registerUser:'/api/register'
+  userexist:'/userexist',
+  registerUser:'/register',
+  isUserExistWithMail:'/getuserbymail',
+  logout:"/logout",
+  loginWithMobile:'/login'
 }

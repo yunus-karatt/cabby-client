@@ -1,4 +1,4 @@
-import CabbyNav from "../../components/user/CabbyNav";
+import CabbyNav from "../../components/auth/CabbyNav";
 import AuthFooter from "../../components/user/AuthFooter";
 import React, { useState } from "react";
 import { userAxios } from "../../constraints/axios/userAxios";

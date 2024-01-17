@@ -1,4 +1,4 @@
-import CabbyNav from "../../components/user/CabbyNav";
+import CabbyNav from "../../components/auth/CabbyNav";
 import React, { useState } from "react";
 import {
   ConfirmationResult,
@@ -52,9 +52,10 @@ const AuthPage = () => {
     setNumber(e.target.value);
 
   const handleSubmit = async () => {
-    const response  = await userAxios.post(userApi.userexist, { number });
+    const response  = await userAxios.post(userApi.userexist, { mobile:number });
     if(response.data){
       existingUser=response.data
+      console.log(response.data)
       dispatch(setCredentials(existingUser))
     }
     // setAxiosData(existingUser)
@@ -66,7 +67,7 @@ const AuthPage = () => {
       <CabbyNav />
       <div className="bg-secondary h-lvh flex justify-center items-center">
         {user ? (
-          <OtpInputGroup  number={number}/>
+          <OtpInputGroup  number={number} role="user" />
         ) : (
           <MobileInput
             onChange={handleChange}

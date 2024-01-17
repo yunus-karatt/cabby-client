@@ -3,11 +3,22 @@ import AuthFooter from "../user/AuthFooter";
 import OtpInput from "./OtpInput";
 import { CustomWindow } from "../../interface/common/common";
 import { useNavigate } from "react-router";
+import { userAxios } from "../../constraints/axios/userAxios";
+import userApi from "../../constraints/api/userApi";
 import { useSelector } from "react-redux";
 import { rootState } from "../../interface/user/userInterface";
+import { adminAxios } from "../../constraints/axios/adminAxios";
+import adminApi from "../../constraints/api/adminApi";
 
-const OtpInputGroup = ({ number }: { number: string }) => {
+const OtpInputGroup = ({
+  number,
+  role,
+}: {
+  number: string;
+  role: "user" | "admin" | "driver";
+}) => {
   const { userInfo } = useSelector((state: rootState) => state.userAuth);
+  const { adminInfo } = useSelector((state: rootState) => state.adminAuth);
   const navigate = useNavigate();
 
   const [inputValues, setInputValues] = useState({
@@ -26,7 +37,7 @@ const OtpInputGroup = ({ number }: { number: string }) => {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const otp: string =
       inputValues.input1 +
       inputValues.input2 +
@@ -39,15 +50,20 @@ const OtpInputGroup = ({ number }: { number: string }) => {
     if (customWindow.confirmationResult) {
       customWindow.confirmationResult
         .confirm(otp)
-        .then(() => {
+        .then(async () => {
           // User signed in successfully.
           // const user = result.user;
-          if (!userInfo) {
-            navigate("/signup", { state: number });
-          } else {
-            navigate("/");
+          if (role === "user") {
+            if (!userInfo) {
+              navigate("/signup", { state: number });
+            } else {
+              await userAxios.post(userApi.loginWithMobile, { mobile: number });
+              navigate("/");
+            }
+          }else if(role==="admin"){
+            await adminAxios.post(adminApi.login,{mobile:number})
+            navigate("/admin")
           }
-          // ...
         })
         .catch((error) => {
           // User couldn't sign in (bad verification code?)
@@ -63,13 +79,23 @@ const OtpInputGroup = ({ number }: { number: string }) => {
       data-autosubmit="true"
       className="h-3/4 w-[360px] border-2 border-white rounded-lg p-4 mt-8  flex flex-col"
     >
-      <p className="text-2xl font-bold my-5">
+      {role==="user" &&<p className="text-2xl font-bold my-5">
         {userInfo
           ? `Welcome back ${userInfo.firstName} ${userInfo.lastName},`
           : "Welcome "}
-      </p>
+      </p>}
+      {role==="admin" &&<p className="text-2xl font-bold my-5">
+        {userInfo
+          ? `Welcome back ${adminInfo.firstName} ${adminInfo.lastName},`
+          : "Welcome "}
+      </p>}
+      {/* {role==="user" &&<p className="text-2xl font-bold my-5">
+        {userInfo
+          ? `Welcome back ${userInfo.firstName} ${userInfo.lastName},`
+          : "Welcome "}
+      </p>} */}
       <p className="text-2xl font-normal">
-        Enter the 4 digit code sent to you{" "}
+        Enter the 6 digit code sent to you{" "}
       </p>
       <div className="w-full mt-4 flex gap-2">
         <OtpInput
