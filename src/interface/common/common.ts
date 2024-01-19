@@ -27,3 +27,12 @@ export interface AxiosData {
   lastName: string;
   mobile: string;
 }
+
+export interface CabInteface {
+  _id: string;
+  cabType: string;
+  basePrice: number |null;
+  pricePerKm: number |null;
+  image: string;
+  maxPersons:number
+}

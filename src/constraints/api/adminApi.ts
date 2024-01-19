@@ -2,5 +2,6 @@ export default{
   getAdminWithMobile:"/checkadminbymobile",
   register:"/register",
   login:"/login",
-  logout:"/logout"
+  logout:"/logout",
+  cab:"/cab"
 }
