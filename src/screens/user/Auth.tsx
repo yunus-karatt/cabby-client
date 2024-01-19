@@ -55,7 +55,6 @@ const AuthPage = () => {
     const response  = await userAxios.post(userApi.userexist, { mobile:number });
     if(response.data){
       existingUser=response.data
-      console.log(response.data)
       dispatch(setCredentials(existingUser))
     }
     // setAxiosData(existingUser)

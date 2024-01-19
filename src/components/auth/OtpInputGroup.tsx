@@ -9,6 +9,9 @@ import { useSelector } from "react-redux";
 import { rootState } from "../../interface/user/userInterface";
 import { adminAxios } from "../../constraints/axios/adminAxios";
 import adminApi from "../../constraints/api/adminApi";
+import { toast } from "react-toastify";
+import { driverAxios } from "../../constraints/axios/driverAxios";
+import driverApi from "../../constraints/api/driverApi";
 
 const OtpInputGroup = ({
   number,
@@ -19,6 +22,7 @@ const OtpInputGroup = ({
 }) => {
   const { userInfo } = useSelector((state: rootState) => state.userAuth);
   const { adminInfo } = useSelector((state: rootState) => state.adminAuth);
+  const {driverInfo}=useSelector((state:rootState)=>state.driverAuth)
   const navigate = useNavigate();
 
   const [inputValues, setInputValues] = useState({
@@ -63,11 +67,20 @@ const OtpInputGroup = ({
           }else if(role==="admin"){
             await adminAxios.post(adminApi.login,{mobile:number})
             navigate("/admin")
+          }else {
+            if(!driverInfo){
+                navigate("/driver/signup",{state:number})
+            }else{
+              await driverAxios.post(driverApi.loginWithMobile,{mobile:number})
+              navigate("/driver")
+              console.log('driver found',driverInfo)
+            }
           }
         })
         .catch((error) => {
           // User couldn't sign in (bad verification code?)
           // ...
+          toast.error("OTP incorrect")
           console.log(error);
         });
     }
@@ -85,15 +98,15 @@ const OtpInputGroup = ({
           : "Welcome "}
       </p>}
       {role==="admin" &&<p className="text-2xl font-bold my-5">
-        {userInfo
-          ? `Welcome back ${adminInfo.firstName} ${adminInfo.lastName},`
+        {adminInfo
+          ? `Welcome back ${adminInfo.name},`
           : "Welcome "}
       </p>}
-      {/* {role==="user" &&<p className="text-2xl font-bold my-5">
-        {userInfo
-          ? `Welcome back ${userInfo.firstName} ${userInfo.lastName},`
+      {role==="driver" &&<p className="text-2xl font-bold my-5">
+        {driverInfo
+          ? `Welcome back ${driverInfo.firstName} ${driverInfo.lastName},`
           : "Welcome "}
-      </p>} */}
+      </p>}
       <p className="text-2xl font-normal">
         Enter the 6 digit code sent to you{" "}
       </p>

@@ -20,7 +20,6 @@ const Auth: React.FC = () => {
   let admin: Admin | null;
   const [number, setNumber] = useState("+919995868047");
   const [user, setUser] = useState<ConfirmationResult | null>(null);
-  // const [axiosData, setAxiosData] = useState<AxiosData|null>(null);
 
   const dispatch = useDispatch();
 
@@ -40,7 +39,6 @@ const Auth: React.FC = () => {
           (confirmationResult) => {
             setUser(confirmationResult);
             (window as CustomWindow).confirmationResult = confirmationResult;
-            // ...
           }
         );
       }
@@ -56,17 +54,14 @@ const Auth: React.FC = () => {
     const response = await adminAxios.post(adminApi.getAdminWithMobile, {
       mobile: number,
     });
-    console.log(response.data);
     if (response.data) {
       admin = response.data;
       console.log(response.data);
       dispatch(setCredentials(admin));
       sendOtp();
     } else {
-      console.log('here')
       toast.error("Please Check your number");
     }
-    // setAxiosData(existingUser)
   };
   return (
     <>
