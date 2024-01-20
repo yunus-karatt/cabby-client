@@ -7,20 +7,20 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
 } from "firebase/auth";
-import { useDispatch } from "react-redux";
+// import { useDispatch } from "react-redux";
 import { CustomWindow } from "../../interface/common/common";
 import { auth } from "../../services/firebase/config";
 import { driverAxios } from "../../constraints/axios/driverAxios";
 import driverApi from "../../constraints/api/driverApi";
-import { setCredentials } from "../../services/redux/slices/driverAuthSlice";
+// import { setCredentials } from "../../services/redux/slices/driverAuthSlice";
 import { Driver } from "../../interface/driver/driverInterface";
 
 const Auth: React.FC = () => {
-  let driver: Driver | null;
+  const [driver,setDriver]=useState<Driver | null>(null);
   const [number, setNumber] = useState("+919995868047");
   const [user, setUser] = useState<ConfirmationResult | null>(null);
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   const sendOtp = () => {
     try {
@@ -55,8 +55,8 @@ const Auth: React.FC = () => {
       mobile: number,
     });
     if (response.data) {
-      driver = response.data;
-      dispatch(setCredentials(driver));
+      setDriver(response.data);
+      // dispatch(setCredentials(driver));
     } 
     sendOtp();
   };
@@ -65,9 +65,10 @@ const Auth: React.FC = () => {
       <CabbyNav />
       <div className="bg-secondary h-lvh flex justify-center items-center">
         {user ? (
-          <OtpInputGroup role="driver" number={number} />
+          <OtpInputGroup data={driver} role="driver" number={number} />
         ) : (
           <MobileInput
+            role="Driver"
             onChange={handleChange}
             number={number}
             handleSubmit={handleSubmit}

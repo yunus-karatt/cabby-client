@@ -1,11 +1,11 @@
 import CabbyNav from "../../components/auth/CabbyNav";
-import AuthFooter from "../../components/user/AuthFooter";
+import AuthFooter from "../../components/auth/AuthFooter";
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { driverAxios } from "../../constraints/axios/driverAxios";
 import driverApi from "../../constraints/api/driverApi";
 import { useDispatch } from "react-redux";
-import { setCredentials } from "../../services/redux/slices/driverAuthSlice";
+import { setDriverCredentials } from "../../services/redux/slices/driverAuthSlice";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ const Signup = () => {
   const handleSubmit = async () => {
     try {
       const driver = await driverAxios.post(driverApi.register, formData);
-      dispatch(setCredentials(driver.data));
+      dispatch(setDriverCredentials(driver.data));
       navigate("/driver/vehicle-registration");
     } catch (error) {
       console.log(error);

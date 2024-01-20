@@ -3,33 +3,32 @@ import { useSidebarContext } from "../../context/SidebarContext";
 import {
   BookDown,
   CalendarCheck,
+  FileClock,
   FileText,
   IndianRupee,
   LayoutDashboard,
   Newspaper,
+  Star,
   User,
   UserCog,
 } from "lucide-react";
 import { ElementType } from "react";
-import { PageHeaderFirstSection } from "./Navbar";
+import { PageHeaderFirstSection } from "./DriverHeader";
 
 const SideBar = () => {
   const { isLargeOpen, isSmallOpen, close } = useSidebarContext();
   return (
     <>
       <aside
-        className={`sticky top-0 overflow-y-auto scrollbar-hidden pb-4 flex flex-col ml-1 ${
+        className={`sticky top-0 overflow-y-auto scrollbar-hidden pb-4 flex flex-col ml-1 h-[100vh] ${
           isLargeOpen ? "lg:hidden" : "lg:flex"
         }`}
       >
-        <SmallSidebarItem Icon={LayoutDashboard} title="Dashboard" url="/admin" />
-        <SmallSidebarItem Icon={CalendarCheck} title="Bookings" url="/" />
-        <SmallSidebarItem Icon={UserCog} title="Drivers" url="/" />
-        <SmallSidebarItem Icon={User} title="Users" url="/admin/userslist" />
-        <SmallSidebarItem Icon={BookDown} title="Requests" url="/" />
-        <SmallSidebarItem Icon={FileText} title="Reports" url="/" />
-        <SmallSidebarItem Icon={IndianRupee} title="Pricing Model" url="/" />
-        <SmallSidebarItem Icon={Newspaper} title="Feedback" url="/" />
+        <SmallSidebarItem Icon={LayoutDashboard} title="Dashboard" url="/" />
+        <SmallSidebarItem Icon={FileClock} title="RideHistory" url="/" />
+        <SmallSidebarItem Icon={IndianRupee} title="Earnings" url="/" />
+        <SmallSidebarItem Icon={Star} title="Feedback" url="/" />
+        <SmallSidebarItem Icon={UserCog} title="Profile" url="/" />
       </aside>
       {isSmallOpen && (
         <div
@@ -49,20 +48,15 @@ const SideBar = () => {
 
         <LargeSidebarItem isActive Icon={LayoutDashboard} title="Dashboard" url="/admin" />
         <hr />
-        <LargeSidebarItem Icon={CalendarCheck} title="Bookings" url="/" />
+        <LargeSidebarItem Icon={FileClock} title="Ride History" url="/" />
         <hr />
-        <LargeSidebarItem Icon={UserCog} title="Drivers" url="/" />
+        <LargeSidebarItem Icon={IndianRupee} title="Earnings" url="/" />
         <hr />
-        <LargeSidebarItem Icon={User} title="Users" url="/admin/userslist" />
+        <LargeSidebarItem Icon={Star} title="Feedback and Ratings" url="/" />
         <hr />
-        <LargeSidebarItem Icon={BookDown} title="Requests" url="/" />
+        <LargeSidebarItem Icon={UserCog} title="Profile" url="/" />
         <hr />
-        <LargeSidebarItem Icon={FileText} title="Reports" url="/" />
-        <hr />
-        <LargeSidebarItem Icon={IndianRupee} title="Pricing Model" url="/admin/pricingmodel" />
-        <hr />
-        <LargeSidebarItem Icon={Newspaper} title="Feedback" url="/" />
-        <hr />
+        
         </div>
       </aside>
     </>

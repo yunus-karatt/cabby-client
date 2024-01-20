@@ -1,12 +1,15 @@
 import CabbyNav from "../../components/auth/CabbyNav";
-import AuthFooter from "../../components/user/AuthFooter";
+import AuthFooter from "../../components/auth/AuthFooter";
 import React, { useState } from "react";
 import { userAxios } from "../../constraints/axios/userAxios";
 import userApi from "../../constraints/api/userApi";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
+import { useDispatch } from "react-redux";
+import { setUserCredentials } from "../../services/redux/slices/userAuthSlice";
 
 const Signup = () => {
-
+  const dispatch=useDispatch()
+  const navigate=useNavigate()
   const location=useLocation()
   const number=location.state
   const [formData, setFormData] = useState({
@@ -27,7 +30,8 @@ const Signup = () => {
 
   const handleSubmit = async() => {
     const user = await userAxios.post(userApi.registerUser, formData);
-    console.log(user)
+    dispatch(setUserCredentials(user.data))
+    navigate("/")
   };
 
   return (

@@ -3,7 +3,6 @@ import { CabInteface } from "../common/common";
 export interface Admin {
   _id: string;
   name: string;
-
   mobile: string;
 }
 

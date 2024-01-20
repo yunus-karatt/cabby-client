@@ -2,6 +2,7 @@ import React from "react";
 import Navbar from "../../components/user/Navbar";
 import homePhoto from "../../assets/Ride-with-Uber.png.png";
 import u4d from "../../assets/u4b-square.png.png";
+import { Link } from "react-router-dom";
 
 const Home: React.FC = () => {
   return (
@@ -16,7 +17,7 @@ const Home: React.FC = () => {
             <p className="text-white font-normal mt-3 text-xs">
               Request a ride, hop in, and go.
             </p>
-            <div className="flex flex-col">
+            <div className="flex flex-col mb-4">
               <input
                 type="text"
                 className="border p-2 mt-3 rounded-lg"
@@ -28,9 +29,9 @@ const Home: React.FC = () => {
                 placeholder="Enter Destination"
               />
             </div>
-            <button className="bg-secondary p-2 mt-3 rounded-lg">
+            <Link to="" className="bg-secondary p-2 rounded-lg">
               See Prices
-            </button>
+            </Link>
           </div>
           <div>
             <img src={homePhoto} alt="landing photo" className="h-[580px]" />
@@ -50,9 +51,9 @@ const Home: React.FC = () => {
               both. You can use your own car or choose a rental <br /> through
               Uber.
             </p>
-            <button className="bg-primary text-white p-3 rounded-lg ">
+            <Link to="/driver/authland" className="bg-primary text-white p-3 rounded-lg w-2/4">
               Get Started
-            </button>
+            </Link>
           </div>
         </div>
       </div>

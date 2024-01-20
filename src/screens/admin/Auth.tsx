@@ -8,20 +8,16 @@ import {
   signInWithPhoneNumber,
 } from "firebase/auth";
 import { Admin } from "../../interface/admin/adminInterface";
-import { setCredentials } from "../../services/redux/slices/adminAuthSlice";
 import { adminAxios } from "../../constraints/axios/adminAxios";
 import adminApi from "../../constraints/api/adminApi";
-import { useDispatch } from "react-redux";
 import { CustomWindow } from "../../interface/common/common";
 import { auth } from "../../services/firebase/config";
 import { toast } from "react-toastify";
 
 const Auth: React.FC = () => {
-  let admin: Admin | null;
+  const [admin, setAdmin] = useState<Admin | null>(null);
   const [number, setNumber] = useState("+919995868047");
   const [user, setUser] = useState<ConfirmationResult | null>(null);
-
-  const dispatch = useDispatch();
 
   const sendOtp = () => {
     try {
@@ -55,9 +51,7 @@ const Auth: React.FC = () => {
       mobile: number,
     });
     if (response.data) {
-      admin = response.data;
-      console.log(response.data);
-      dispatch(setCredentials(admin));
+      setAdmin(response.data);
       sendOtp();
     } else {
       toast.error("Please Check your number");
@@ -68,9 +62,10 @@ const Auth: React.FC = () => {
       <CabbyNav />
       <div className="bg-secondary h-lvh flex justify-center items-center">
         {user ? (
-          <OtpInputGroup role="admin" number={number} />
+          <OtpInputGroup data={admin} role="admin" number={number} />
         ) : (
           <MobileInput
+            role="Admin"
             onChange={handleChange}
             number={number}
             handleSubmit={handleSubmit}

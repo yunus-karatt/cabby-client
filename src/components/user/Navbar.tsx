@@ -39,7 +39,8 @@ const Navbar = () => {
     if (isMediumScreen) {
       setIsOpen(false);
     }
-  }, [isMediumScreen]);
+    console.log(userInfo)
+  }, [isMediumScreen,userInfo]);
 
   return (
     <>
@@ -138,7 +139,9 @@ const Navbar = () => {
                 <ArrowRight />
               </div>
               <div className="flex items-center border-b-2 border-black hover:border-primary hover:text-primary p-5">
-                <h2 className=" me-5 ">Drive With Cabby</h2>
+                <h2 className=" me-5 ">
+                <Link to="/driver/authland">Drive With Cabby</Link>
+                  </h2>
                 <ArrowRight />
               </div>
               {userInfo && (

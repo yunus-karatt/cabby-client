@@ -1,28 +1,35 @@
-import { useState } from "react";
-import AuthFooter from "../user/AuthFooter";
+import { useEffect, useState } from "react";
+import AuthFooter from "./AuthFooter";
 import OtpInput from "./OtpInput";
 import { CustomWindow } from "../../interface/common/common";
 import { useNavigate } from "react-router";
 import { userAxios } from "../../constraints/axios/userAxios";
 import userApi from "../../constraints/api/userApi";
-import { useSelector } from "react-redux";
-import { rootState } from "../../interface/user/userInterface";
 import { adminAxios } from "../../constraints/axios/adminAxios";
 import adminApi from "../../constraints/api/adminApi";
 import { toast } from "react-toastify";
 import { driverAxios } from "../../constraints/axios/driverAxios";
 import driverApi from "../../constraints/api/driverApi";
+import { AlertCircle } from "lucide-react";
+import { useDispatch } from "react-redux";
+import {  setUserCredentials } from "../../services/redux/slices/userAuthSlice";
+import { setAdminCredentials } from "../../services/redux/slices/adminAuthSlice";
+import { setDriverCredentials } from "../../services/redux/slices/driverAuthSlice";
 
 const OtpInputGroup = ({
   number,
   role,
+  data
 }: {
   number: string;
   role: "user" | "admin" | "driver";
+  data:{firstName?:string,lastName?:string,email?:string,mobile:string,_id:string,name?:string}|null
 }) => {
-  const { userInfo } = useSelector((state: rootState) => state.userAuth);
-  const { adminInfo } = useSelector((state: rootState) => state.adminAuth);
-  const {driverInfo}=useSelector((state:rootState)=>state.driverAuth)
+  const dispatch=useDispatch()
+
+  // const { userInfo } = useSelector((state: rootState) => state.userAuth);
+  // const { adminInfo } = useSelector((state: rootState) => state.adminAuth);
+  // const {driverInfo}=useSelector((state:rootState)=>state.driverAuth)
   const navigate = useNavigate();
 
   const [inputValues, setInputValues] = useState({
@@ -33,7 +40,7 @@ const OtpInputGroup = ({
     input5: "",
     input6: "",
   });
-
+  const [error,setError]=useState({isErr:false,message:""})
   const handleInputChange = (inputId: string, value: string) => {
     setInputValues((prev) => ({
       ...prev,
@@ -50,6 +57,11 @@ const OtpInputGroup = ({
       inputValues.input5 +
       inputValues.input6;
 
+      if(otp.length!==6){
+        setError(()=>({isErr:true,message:"OTP MUST HAVE SIX NUMBERS "}))
+        return
+      }
+
     const customWindow = window as CustomWindow;
     if (customWindow.confirmationResult) {
       customWindow.confirmationResult
@@ -58,28 +70,32 @@ const OtpInputGroup = ({
           // User signed in successfully.
           // const user = result.user;
           if (role === "user") {
-            if (!userInfo) {
+            if (!data) {
               navigate("/signup", { state: number });
             } else {
+              dispatch(setUserCredentials(data))
+
               await userAxios.post(userApi.loginWithMobile, { mobile: number });
               navigate("/");
             }
           }else if(role==="admin"){
+            dispatch(setAdminCredentials(data))
             await adminAxios.post(adminApi.login,{mobile:number})
             navigate("/admin")
           }else {
-            if(!driverInfo){
+            if(!data){
                 navigate("/driver/signup",{state:number})
             }else{
               await driverAxios.post(driverApi.loginWithMobile,{mobile:number})
+              dispatch(setDriverCredentials(data))
               navigate("/driver")
-              console.log('driver found',driverInfo)
             }
           }
         })
         .catch((error) => {
           // User couldn't sign in (bad verification code?)
           // ...
+          setError(()=>({isErr:true,message:"invalid otp"}))
           toast.error("OTP incorrect")
           console.log(error);
         });
@@ -93,18 +109,18 @@ const OtpInputGroup = ({
       className="h-3/4 w-[360px] border-2 border-white rounded-lg p-4 mt-8  flex flex-col"
     >
       {role==="user" &&<p className="text-2xl font-bold my-5">
-        {userInfo
-          ? `Welcome back ${userInfo.firstName} ${userInfo.lastName},`
+        {data
+          ? `Welcome back ${data.firstName} ${data.lastName},`
           : "Welcome "}
       </p>}
       {role==="admin" &&<p className="text-2xl font-bold my-5">
-        {adminInfo
-          ? `Welcome back ${adminInfo.name},`
+        {data
+          ? `Welcome back ${data.name},`
           : "Welcome "}
       </p>}
       {role==="driver" &&<p className="text-2xl font-bold my-5">
-        {driverInfo
-          ? `Welcome back ${driverInfo.firstName} ${driverInfo.lastName},`
+        {data
+          ? `Welcome back ${data.firstName} ${data.lastName},`
           : "Welcome "}
       </p>}
       <p className="text-2xl font-normal">
@@ -112,6 +128,7 @@ const OtpInputGroup = ({
       </p>
       <div className="w-full mt-4 flex gap-2">
         <OtpInput
+        error={error.isErr}
           id="input1"
           value={inputValues.input1}
           onValueChange={handleInputChange}
@@ -120,6 +137,7 @@ const OtpInputGroup = ({
           nextId="input2"
         />
         <OtpInput
+         error={error.isErr}
           id="input2"
           value={inputValues.input2}
           onValueChange={handleInputChange}
@@ -128,6 +146,7 @@ const OtpInputGroup = ({
           nextId="input3"
         />
         <OtpInput
+         error={error.isErr}
           id="input3"
           value={inputValues.input3}
           onValueChange={handleInputChange}
@@ -136,6 +155,7 @@ const OtpInputGroup = ({
           nextId="input4"
         />
         <OtpInput
+         error={error.isErr}
           id="input4"
           value={inputValues.input4}
           onValueChange={handleInputChange}
@@ -144,6 +164,7 @@ const OtpInputGroup = ({
           nextId="input5"
         />
         <OtpInput
+         error={error.isErr}
           id="input5"
           value={inputValues.input5}
           onValueChange={handleInputChange}
@@ -152,6 +173,7 @@ const OtpInputGroup = ({
           nextId="input6"
         />
         <OtpInput
+         error={error.isErr}
           id="input6"
           value={inputValues.input6}
           onValueChange={handleInputChange}
@@ -160,6 +182,11 @@ const OtpInputGroup = ({
           nextId={null}
         />
       </div>
+      {error.isErr && (
+          <p className="mt-1  text-[#ff0000] flex gap-x-2 rounded-sm">
+            <AlertCircle /> {error.message}
+          </p>
+        )}
       <button
         onClick={handleSubmit}
         className="w-full bg-primary text-white rounded-lg mt-6 p-3"
