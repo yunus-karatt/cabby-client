@@ -6,9 +6,6 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { cabby } from "../../services/firebase/config";
 
 const VehiclePhoto = ({
-  // setVehiclePhot1Prop,
-  // setVehiclePhot2Prop,
-  // setVehicleTypeProp,
   setVehicleData,
   postDetails,
 }: {
@@ -19,9 +16,6 @@ const VehiclePhoto = ({
       type: string;
     }>
   >;
-  // setVehiclePhot1Prop: React.Dispatch<React.SetStateAction<string>>;
-  // setVehiclePhot2Prop: React.Dispatch<React.SetStateAction<string>>;
-  // setVehicleTypeProp: React.Dispatch<React.SetStateAction<string>>;
   postDetails: (url1:string,url2:string,model:string) => void;
 }) => {
   const [cabType, setCabType] = useState<
@@ -65,11 +59,6 @@ const VehiclePhoto = ({
         await uploadBytes(imageRef2, file2);
          downloadURL1 = await getDownloadURL(imageRef1);
          downloadURL2 = await getDownloadURL(imageRef2);
-        console.log({ downloadURL1, downloadURL2, vehicleCat });
-        // console.log("setVehiclePhot1Prop:", setVehiclePhot1Prop);
-        // setVehiclePhot1Prop((prev) => downloadURL1);
-        // setVehiclePhot2Prop((prevVehiclePhot2) => downloadURL2);
-        // setVehicleTypeProp((prevVehicleCat) => vehicleCat);
         setVehicleData(() => {
           return {
             imag1: downloadURL1,

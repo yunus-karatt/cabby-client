@@ -48,7 +48,7 @@ const VehicleInput = () => {
       },
       vehicleDocuments: {
         registration: {
-          registration: registration?.number,
+          registrationId: registration?.number,
           registrationImage: registration?.photo,
         },
         vehicleImage1: url1,

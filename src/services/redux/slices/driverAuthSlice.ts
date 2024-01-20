@@ -15,7 +15,7 @@ const driverAuthSlice = createSlice({
   name: "driverAuth",
   initialState,
   reducers: {
-    setCredentials: (state, action) => {
+    setDriverCredentials: (state, action) => {
       state.driverInfo = action.payload;
       localStorage.setItem("driverInfo", JSON.stringify(action.payload));
     },
@@ -26,5 +26,5 @@ const driverAuthSlice = createSlice({
   },
 });
 
-export const { setCredentials,logout } = driverAuthSlice.actions;
+export const { setDriverCredentials,logout } = driverAuthSlice.actions;
 export default driverAuthSlice.reducer;

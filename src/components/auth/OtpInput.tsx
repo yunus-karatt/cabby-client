@@ -6,6 +6,7 @@ const OtpInput = ({
   previousId,
   nextId,
   value,
+  error,
   onValueChange,
   handleSubmit,
 }: OtpInputProps) => {
@@ -48,8 +49,9 @@ const OtpInput = ({
           onValueChange(id, e.target.value)
         }
         onKeyUp={handleKeyUp}
-        className="w-12 h-12 rounded-md text-center font-bold text-lg"
-        type="number"
+        className={`w-12 h-12 rounded-md text-center font-bold text-lg"
+        ${error && "border border-[#ff0000]"}`}
+        type="number" 
       />
     </div>
   );

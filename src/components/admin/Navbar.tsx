@@ -12,6 +12,7 @@ const Navbar = () => {
   const { adminInfo } = useSelector((state: rootState) => state.adminAuth);
   const [showDiv, setShowDiv] = useState(false);
   const dispatch=useDispatch()
+
   const toggleDiv = () => {
     setShowDiv((state) => !state);
   };

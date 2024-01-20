@@ -11,12 +11,14 @@ export interface OtpInputProps {
   previousId: string | null;
   nextId: string | null;
   value: string;
+  error:boolean;
   onValueChange: (id: string, value: string) => void;
   handleSubmit: () => void;
 }
 
 export interface MobileInputProps {
   number: string;
+  role:"Admin"|"User"|"Driver"
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: () => void;
 }

@@ -3,5 +3,6 @@ export default{
   register:"/register",
   login:"/login",
   logout:"/logout",
-  cab:"/cab"
+  cab:"/cab",
+  getUsers:"/getusers"
 }

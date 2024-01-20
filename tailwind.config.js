@@ -10,7 +10,9 @@ export default {
         "primary":"#BE3455",
         "secondary":"#D4CACD",
         "hover":"#EEEEEE",
-        "text-secondary":"#6B6B6B"
+        "text-secondary":"#6B6B6B",
+        "danger":"#ff0000",
+        "success":"#00cc66"
       },
       keyframes:{
         slideDown:{
