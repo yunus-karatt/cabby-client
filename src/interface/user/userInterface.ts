@@ -23,6 +23,7 @@ export interface rootState {
   userAuth: UserAuthSlice;
   adminAuth: AdminAuthSlice;
   driverAuth: DriverAuthSlice;
+  routeCoordinates:RouteCoordinates;
 }
 
 export interface UserData {
@@ -33,8 +34,22 @@ export interface UserData {
   isBlocked: boolean;
   joinedAt: string;
   lastName: string;
-  mobile: string|null;
+  mobile: string | null;
   updatedAt: string;
   __v: number;
   _id: string;
+}
+
+// export interface LocationSuggestion{
+//   place_name:string
+
+export interface RouteCoordinates {
+  source: {
+    lat: number;
+    long: number;
+  };
+  destination: {
+    lat: number;
+    long: number;
+  };
 }

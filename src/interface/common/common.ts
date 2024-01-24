@@ -21,6 +21,7 @@ export interface MobileInputProps {
   role:"Admin"|"User"|"Driver"
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: () => void;
+  isLoading?:boolean
 }
 
 export interface AxiosData {

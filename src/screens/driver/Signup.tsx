@@ -19,6 +19,11 @@ const Signup = () => {
     email: "",
     mobile: number,
   });
+  const [errors, setErrors] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => {
@@ -27,9 +32,36 @@ const Signup = () => {
         [e.target.name]: e.target.value,
       };
     });
+    setErrors((prev) => {
+      return {
+        ...prev,
+        [e.target.name]: "",
+      };
+    });
   };
 
   const handleSubmit = async () => {
+    const validationErrors = {
+      firstName: "",
+      lastName: "",
+      email: "",
+    };
+    if (!formData.firstName.trim()) {
+      validationErrors.firstName = "First Name is required";
+    }
+    if (!formData.lastName.trim()) {
+      validationErrors.lastName = "Last Name is required";
+    }
+    if (!formData.email.trim()) {
+      validationErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      validationErrors.email = "Invalid email address";
+    }
+
+    if (validationErrors.firstName || validationErrors.lastName || validationErrors.email) {
+      setErrors(validationErrors);
+      return;
+    }
     try {
       const driver = await driverAxios.post(driverApi.register, formData);
       dispatch(setDriverCredentials(driver.data));
@@ -51,10 +83,11 @@ const Signup = () => {
               onChange={handleChange}
               id="firstName"
               name="firstName"
-              className="p-3 w-full rounded-lg border-2 border-black my-2"
+              className={`p-3 w-full rounded-lg border-2 border-black my-2 ${errors.firstName && "border border-danger"}`}
               type="text"
               placeholder="Enter Your First Name"
             />
+            <p className="text-danger">{errors.firstName}</p>
             <label htmlFor="lastName">Last Name</label>
 
             <input
@@ -62,20 +95,22 @@ const Signup = () => {
               onChange={handleChange}
               name="lastName"
               id="lastName"
-              className="p-3 w-full rounded-lg border-2 border-black my-2"
+              className={`p-3 w-full rounded-lg border-2 border-black my-2 ${errors.lastName && "border border-danger"}`}
               type="text"
               placeholder="Enter Last Name"
             />
+            <p className="text-danger">{errors.lastName}</p>
             <label htmlFor="email">Email</label>
             <input
               value={formData.email}
               onChange={handleChange}
               name="email"
               id="email"
-              className="p-3 w-full rounded-lg border-2 border-black my-2"
+              className={`p-3 w-full rounded-lg border-2 border-black my-2 ${errors.email && "border border-danger"}`}
               type="email"
               placeholder="Enter Your Email"
             />
+            <p className="text-danger">{errors.email}</p>
             <button
               onClick={handleSubmit}
               className="w-full bg-primary text-white rounded-lg mt-6 p-3"

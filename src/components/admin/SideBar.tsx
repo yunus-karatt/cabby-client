@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useSidebarContext } from "../../context/SidebarContext";
 import {
   BookDown,
@@ -14,7 +14,11 @@ import { ElementType } from "react";
 import { PageHeaderFirstSection } from "./Navbar";
 
 const SideBar = () => {
+  const location=useLocation()
   const { isLargeOpen, isSmallOpen, close } = useSidebarContext();
+  const isActive = (url: string): boolean => {
+    return location.pathname === url;
+  };
   return (
     <>
       <aside
@@ -24,9 +28,9 @@ const SideBar = () => {
       >
         <SmallSidebarItem Icon={LayoutDashboard} title="Dashboard" url="/admin" />
         <SmallSidebarItem Icon={CalendarCheck} title="Bookings" url="/" />
-        <SmallSidebarItem Icon={UserCog} title="Drivers" url="/" />
+        <SmallSidebarItem Icon={UserCog} title="Drivers" url="/admin/driverslist" />
         <SmallSidebarItem Icon={User} title="Users" url="/admin/userslist" />
-        <SmallSidebarItem Icon={BookDown} title="Requests" url="/" />
+        <SmallSidebarItem Icon={BookDown} title="Requests" url="/admin/requests" />
         <SmallSidebarItem Icon={FileText} title="Reports" url="/" />
         <SmallSidebarItem Icon={IndianRupee} title="Pricing Model" url="/" />
         <SmallSidebarItem Icon={Newspaper} title="Feedback" url="/" />
@@ -47,21 +51,21 @@ const SideBar = () => {
         </div>
         <div className="h-[100vh]">
 
-        <LargeSidebarItem isActive Icon={LayoutDashboard} title="Dashboard" url="/admin" />
+        <LargeSidebarItem isActive={isActive("/admin")} Icon={LayoutDashboard} title="Dashboard" url="/admin" />
         <hr />
-        <LargeSidebarItem Icon={CalendarCheck} title="Bookings" url="/" />
+        <LargeSidebarItem isActive={isActive("/admin/bookings")} Icon={CalendarCheck} title="Bookings" url="/admin/bookings" />
         <hr />
-        <LargeSidebarItem Icon={UserCog} title="Drivers" url="/" />
+        <LargeSidebarItem isActive={isActive("/admin/driverslist")} Icon={UserCog} title="Drivers" url="/admin/driverslist" />
         <hr />
-        <LargeSidebarItem Icon={User} title="Users" url="/admin/userslist" />
+        <LargeSidebarItem isActive={isActive("/admin/userslist")} Icon={User} title="Users" url="/admin/userslist" />
         <hr />
-        <LargeSidebarItem Icon={BookDown} title="Requests" url="/" />
+        <LargeSidebarItem isActive={isActive("/admin/requests")} Icon={BookDown} title="Requests" url="/admin/requests" />
         <hr />
-        <LargeSidebarItem Icon={FileText} title="Reports" url="/" />
+        <LargeSidebarItem isActive={isActive("/admin/reports")} Icon={FileText} title="Reports" url="/admin/reports" />
         <hr />
-        <LargeSidebarItem Icon={IndianRupee} title="Pricing Model" url="/admin/pricingmodel" />
+        <LargeSidebarItem isActive={isActive("/admin/pricingmodel")} Icon={IndianRupee} title="Pricing Model" url="/admin/pricingmodel" />
         <hr />
-        <LargeSidebarItem Icon={Newspaper} title="Feedback" url="/" />
+        <LargeSidebarItem isActive={isActive("/admin/feedbacks")} Icon={Newspaper} title="Feedback" url="/admin/feedbacks" />
         <hr />
         </div>
       </aside>

@@ -6,6 +6,7 @@ import Home from "../../screens/user/Home";
 import Auth from "../../screens/user/Auth";
 import Signup from "../../screens/user/Signup";
 import PageNotFound from "../../components/common/PageNotFound";
+import SearchRide from "../../screens/user/SearchRide";
 
 const UserRoutes: React.FC = () => {
   return (
@@ -15,6 +16,7 @@ const UserRoutes: React.FC = () => {
       <Route path="/help" element={<Help />} />
       <Route path="/authland" element={<Auth />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/search-ride" element={<SearchRide />} />
       <Route path="/*" element={<PageNotFound />} />
     </Routes>
   );

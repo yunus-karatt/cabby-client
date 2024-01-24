@@ -4,5 +4,13 @@ export default{
   login:"/login",
   logout:"/logout",
   cab:"/cab",
-  getUsers:"/getusers"
+  getUsers:"/getusers",
+  blockUser:"/blockuser",
+  getRequest:"/driver-requests",
+  verifyDriver:"/verify-driver",
+  rejectDriver:"/reject-driver",
+  getDrivers:"/get-drivers",
+  blockDriver:"/blockdriver",
+  searchUser:"/search-user",
+  searchDriver:"/search-driver"
 }
