@@ -3,6 +3,7 @@ import Navbar from "../../components/user/Navbar";
 import homePhoto from "../../assets/Ride-with-Uber.png.png";
 import u4d from "../../assets/u4b-square.png.png";
 import { Link } from "react-router-dom";
+import Spinner from "../../components/common/Spinner";
 
 const Home: React.FC = () => {
   return (

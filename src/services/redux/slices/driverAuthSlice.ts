@@ -22,6 +22,7 @@ const driverAuthSlice = createSlice({
     logout:(state)=>{
       state.driverInfo=null
       localStorage.removeItem("driverInfo")
+      localStorage.removeItem("driverToken")
     }
   },
 });

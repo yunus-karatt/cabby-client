@@ -16,7 +16,7 @@ const VehiclePhoto = ({
       type: string;
     }>
   >;
-  postDetails: (url1:string,url2:string,model:string) => void;
+  postDetails: (url1: string, url2: string, model: string) => void;
 }) => {
   const [cabType, setCabType] = useState<
     { cabType: string; maxPersons: number; _id: string }[]
@@ -27,6 +27,25 @@ const VehiclePhoto = ({
   const [preview1, setPreview1] = useState<string | ArrayBuffer | null>(null);
   const [preview2, setPreview2] = useState<string | ArrayBuffer | null>(null);
   const [vehicleCat, setVehicleCat] = useState<string>("");
+  const [errors, setErrors] = useState({
+    file1: "",
+    file2: "",
+    vehicleCat: "",
+  });
+
+  const validateImage = (file: File, fileNumber: number) => {
+    const allowedTypes = ["image/jpeg", "image/png"];
+
+    if (!allowedTypes.includes(file.type)) {
+      setErrors((prev) => ({
+        ...prev,
+        [`file${fileNumber}`]:
+          "Invalid file type. Please choose a JPEG or PNG image.",
+      }));
+      return false;
+    }
+    return true;
+  };
 
   function handleOnChange(e: React.FormEvent<HTMLInputElement>) {
     const target = e.target as HTMLInputElement & {
@@ -49,16 +68,31 @@ const VehiclePhoto = ({
   }
 
   const handleSubmit = async () => {
-    let downloadURL1:string;
-    let downloadURL2:string
+    let downloadURL1: string;
+    let downloadURL2: string;
+    if (!file1 || !validateImage(file1, 1)) {
+      setErrors((prev) => ({ ...prev, file1: "Photo 1 is required" }));
+    }
+
+    if (!file2 || !validateImage(file2, 2)) {
+      setErrors((prev) => ({ ...prev, file2: "Photo 2 is required" }));
+    }
+
+    if (!vehicleCat) {
+      setErrors((prev) => ({
+        ...prev,
+        vehicleCat: "Vehicle category is required",
+      }));
+      return;
+    }
     try {
       const imageRef1 = ref(cabby, `vehicle-photo/${Date.now()}`);
       const imageRef2 = ref(cabby, `vehicle-photo/${Date.now() + 1}`);
-      if (file1 && file2) {
+      if (file1 && file2 && vehicleCat) {
         await uploadBytes(imageRef1, file1);
         await uploadBytes(imageRef2, file2);
-         downloadURL1 = await getDownloadURL(imageRef1);
-         downloadURL2 = await getDownloadURL(imageRef2);
+        downloadURL1 = await getDownloadURL(imageRef1);
+        downloadURL2 = await getDownloadURL(imageRef2);
         setVehicleData(() => {
           return {
             imag1: downloadURL1,
@@ -66,7 +100,7 @@ const VehiclePhoto = ({
             type: vehicleCat,
           };
         });
-         postDetails(downloadURL1,downloadURL2,vehicleCat);
+        postDetails(downloadURL1, downloadURL2, vehicleCat);
       }
     } catch (error) {
       console.log(error);
@@ -98,6 +132,7 @@ const VehiclePhoto = ({
           type="file"
           name="vehicleImage1"
         />
+        <p className="text-danger">{errors.file1}</p>
         {preview1 && (
           <p>
             <img src={preview1 as string} alt="Upload preview" />
@@ -112,6 +147,8 @@ const VehiclePhoto = ({
           type="file"
           name="vehicleImage2"
         />
+        <p className="text-danger">{errors.file2}</p>
+
         {preview2 && (
           <p>
             <img src={preview2 as string} alt="Upload preview" />
@@ -136,6 +173,8 @@ const VehiclePhoto = ({
               );
             })}
         </select>
+        <p className="text-danger">{errors.vehicleCat}</p>
+
       </div>
       <div className="flex justify-center items-center shadow-[0px_-8px_20px_0px_rgba(0,0,0,0.08)] p-3">
         <button

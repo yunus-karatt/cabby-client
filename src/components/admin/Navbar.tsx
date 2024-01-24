@@ -18,6 +18,7 @@ const Navbar = () => {
   };
   const handleLogOut=async()=>{
    const res= await adminAxios.post(adminApi.logout)
+   console.log(res.data)
    if(res.data){
     dispatch(logout())
    }

@@ -3,12 +3,14 @@ import AuthFooter from "./AuthFooter";
 import { MobileInputProps } from "../../interface/common/common";
 import Oauth from "./Oauth";
 import { AlertCircle } from "lucide-react";
+import Spinner from "../common/Spinner";
 
 const MobileInput = ({
   number,
   onChange,
   handleSubmit,
   role,
+  isLoading
 }: MobileInputProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [error, setError] = useState(false);
@@ -63,11 +65,11 @@ const MobileInput = ({
         <button
           onClick={handleClick}
           id="sign-in-button"
-          className={`w-full bg-primary text-white rounded-lg mt-6 p-3 ${
+          className={`w-full bg-primary text-white rounded-lg mt-6 p-3 flex justify-center gap-x-3 ${
             error ? "bg-opacity-50" : ""
           }`}
         >
-          Continue
+         {isLoading && <Spinner />} Continue
         </button>
       </div>
       <hr className="w-full border-black my-6" />

@@ -18,7 +18,7 @@ const AuthPage = () => {
   const [number, setNumber] = useState("+919995868047");
   const [user, setUser] = useState<ConfirmationResult | null>(null);
   // const [axiosData, setAxiosData] = useState<AxiosData|null>(null);
-
+  const [isLoading,setIsLoading]=useState(false)
 
   const sendOtp = () => {
     try {
@@ -34,6 +34,7 @@ const AuthPage = () => {
       if (appVerifier) {
         signInWithPhoneNumber(auth, number, appVerifier).then(
           (confirmationResult) => {
+            setIsLoading(false);
             setUser(confirmationResult);
             (window as CustomWindow).confirmationResult = confirmationResult;
             // ...
@@ -49,6 +50,7 @@ const AuthPage = () => {
     setNumber(e.target.value);
 
   const handleSubmit = async () => {
+    setIsLoading(true)
     const response  = await userAxios.post(userApi.userexist, { mobile:number });
     if(response.data){
       setExistingUser(response.data)
@@ -66,6 +68,7 @@ const AuthPage = () => {
           <OtpInputGroup data={existingUser} number={number} role="user" />
         ) : (
           <MobileInput
+            isLoading={isLoading}
             role="User"
             onChange={handleChange}
             number={number}

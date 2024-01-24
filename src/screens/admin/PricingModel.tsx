@@ -6,6 +6,7 @@ import PriceModelPopup from "../../components/admin/PriceModelPopup";
 import { CabInteface } from "../../interface/common/common";
 import { adminAxios } from "../../constraints/axios/adminAxios";
 import adminApi from "../../constraints/api/adminApi";
+import Spinner from "../../components/common/Spinner";
 
 const PricingModel = () => {
   const [preview, setPreview] = useState<string | ArrayBuffer | null>(null);
@@ -15,7 +16,11 @@ const PricingModel = () => {
   const togglePopup = () => {
     setPopup((state) => !state);
   };
+  const[imageLoader,setImageLoader]=useState(true)
 
+  const handleLoader=()=>{
+    setImageLoader(false)
+  }
   useEffect(() => {
     const fetchCab = async () => {
       const response = await adminAxios.get(adminApi.cab);
@@ -51,7 +56,8 @@ const PricingModel = () => {
                   {cab.map((cab) => {
                     return (
                       <div key={cab._id} className="flex flex-col items-center ">
-                        <img src={cab.image} alt="" />
+                        {imageLoader && <Spinner/> }
+                        <img onLoad={handleLoader} src={cab.image} alt="" />
                         <p className="font-bold">{cab.cabType}</p>
                         <p className="text-text-secondary">{`(${cab.maxPersons} seater)`}</p>
                         <div className="mt-10 font-bold">

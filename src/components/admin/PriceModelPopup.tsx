@@ -22,6 +22,7 @@ const PriceModelPopup = ({
     pricePerKm: "",
     image: "",
   });
+  
 
   const onDrop = useCallback((acceptedFiles: Array<File>) => {
     setFile(acceptedFiles[0]);
@@ -46,18 +47,18 @@ const PriceModelPopup = ({
   };
 
   const handleSubmit = async () => {
+    
     try {
       const imageRef = ref(cabby, `cab-types/${formData.cabType}`);
       if (file) {
         await uploadBytes(imageRef, file);
         const downloadURL = await getDownloadURL(imageRef);
-        console.log(downloadURL);
         setFormData((state) => {
           return { ...state, image: downloadURL };
         });
-        console.log({formData})
        const cab= await adminAxios.post(adminApi.cab,{...formData,image:downloadURL})
         setNewCab(cab.data)
+        setPopup(false)
       }
     } catch (error) {
       console.log(error);
@@ -92,8 +93,10 @@ const PriceModelPopup = ({
             <Camera className="w-1/2 h-1/2" />
           )}
         </div>
+
       </div>
       <div className="flex flex-col p-3 ms-10 gap-y-2 w-[82%]">
+        {/* {errors.image && <p className="text-danger">{errors.image}</p> } */}
         <label htmlFor="cabtype" className="font-bold">
           Cab Type
         </label>
@@ -104,6 +107,7 @@ const PriceModelPopup = ({
           type="text"
           placeholder="Enter cab type EX. XL"
         />
+        {/* {errors.cabType && <p className="text-danger">{errors.cabType}</p> } */}
         <label htmlFor="cabtype" className="font-bold">
           Seats
         </label>
@@ -114,6 +118,8 @@ const PriceModelPopup = ({
           type="number"
           placeholder="Enter Maximum passenger count"
         />
+        {/* {errors.maxPersons && <p className="text-danger">{errors.maxPersons}</p> } */}
+
         <label htmlFor="cabtype" className="font-bold">
           Base Price
         </label>
@@ -124,6 +130,8 @@ const PriceModelPopup = ({
           type="number"
           placeholder="Enter Minimum charge"
         />
+        {/* {errors.basePrice && <p className="text-danger">{errors.basePrice}</p> } */}
+
         <label htmlFor="cabtype" className="font-bold">
           KM price
         </label>
@@ -134,6 +142,8 @@ const PriceModelPopup = ({
           type="number"
           placeholder="Enter Price per KM"
         />
+        {/* {errors.pricePerKm && <p className="text-danger">{errors.pricePerKm}</p> } */}
+
       </div>
       <div className="flex justify-center mb-3">
         <button

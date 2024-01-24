@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import AuthFooter from "./AuthFooter";
 import OtpInput from "./OtpInput";
 import { CustomWindow } from "../../interface/common/common";
@@ -15,6 +15,7 @@ import { useDispatch } from "react-redux";
 import {  setUserCredentials } from "../../services/redux/slices/userAuthSlice";
 import { setAdminCredentials } from "../../services/redux/slices/adminAuthSlice";
 import { setDriverCredentials } from "../../services/redux/slices/driverAuthSlice";
+import Spinner from "../common/Spinner";
 
 const OtpInputGroup = ({
   number,
@@ -25,11 +26,8 @@ const OtpInputGroup = ({
   role: "user" | "admin" | "driver";
   data:{firstName?:string,lastName?:string,email?:string,mobile:string,_id:string,name?:string}|null
 }) => {
-  const dispatch=useDispatch()
 
-  // const { userInfo } = useSelector((state: rootState) => state.userAuth);
-  // const { adminInfo } = useSelector((state: rootState) => state.adminAuth);
-  // const {driverInfo}=useSelector((state:rootState)=>state.driverAuth)
+  const dispatch=useDispatch()
   const navigate = useNavigate();
 
   const [inputValues, setInputValues] = useState({
@@ -40,7 +38,10 @@ const OtpInputGroup = ({
     input5: "",
     input6: "",
   });
+
   const [error,setError]=useState({isErr:false,message:""})
+  const [isLoading,setIsLoading]=useState(false)
+
   const handleInputChange = (inputId: string, value: string) => {
     setInputValues((prev) => ({
       ...prev,
@@ -61,33 +62,49 @@ const OtpInputGroup = ({
         setError(()=>({isErr:true,message:"OTP MUST HAVE SIX NUMBERS "}))
         return
       }
-
+      
     const customWindow = window as CustomWindow;
     if (customWindow.confirmationResult) {
+      setIsLoading(true)
       customWindow.confirmationResult
         .confirm(otp)
         .then(async () => {
           // User signed in successfully.
           // const user = result.user;
+          setIsLoading(false)
           if (role === "user") {
             if (!data) {
               navigate("/signup", { state: number });
             } else {
               dispatch(setUserCredentials(data))
-
-              await userAxios.post(userApi.loginWithMobile, { mobile: number });
+              setIsLoading(true)
+              const res=await userAxios.post(userApi.loginWithMobile, { mobile: number });
+              const {token}=res.data
+              localStorage.setItem("userToken",token)
+              setIsLoading(false)
               navigate("/");
             }
           }else if(role==="admin"){
             dispatch(setAdminCredentials(data))
-            await adminAxios.post(adminApi.login,{mobile:number})
+            setIsLoading(true)
+
+            const res=await adminAxios.post(adminApi.login,{mobile:number})
+            const {token}=res.data
+            localStorage.setItem("adminToken",token)
+            setIsLoading(false)
+
             navigate("/admin")
           }else {
             if(!data){
                 navigate("/driver/signup",{state:number})
             }else{
-              await driverAxios.post(driverApi.loginWithMobile,{mobile:number})
+              setIsLoading(true)
+
+              const res=await driverAxios.post(driverApi.loginWithMobile,{mobile:number})
+              const {token}=res.data
+              setIsLoading(false)
               dispatch(setDriverCredentials(data))
+              localStorage.setItem("driverToken",token)
               navigate("/driver")
             }
           }
@@ -189,9 +206,9 @@ const OtpInputGroup = ({
         )}
       <button
         onClick={handleSubmit}
-        className="w-full bg-primary text-white rounded-lg mt-6 p-3"
+        className="w-full bg-primary text-white rounded-lg mt-6 p-3 flex justify-center gap-x-3"
       >
-        Continue
+       {isLoading && <Spinner/>} Continue
       </button>
       <hr className="w-full border-black my-6" />
       <AuthFooter />
