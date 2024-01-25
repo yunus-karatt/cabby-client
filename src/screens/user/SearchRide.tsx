@@ -44,6 +44,7 @@ const SearchRide = () => {
   useEffect(() => {
     getUserLocation();
   }, []);
+
   useEffect(() => {
     if (source.lat && source.long) {
       mapRef?.current?.flyTo({
@@ -52,6 +53,7 @@ const SearchRide = () => {
       });
     }
   }, [source]);
+
   useEffect(() => {
     if (destination.lat && destination.long) {
       mapRef?.current?.flyTo({
@@ -63,6 +65,7 @@ const SearchRide = () => {
       getDirectionRoute();
     }
   }, [destination]);
+
   const getDirectionRoute = async () => {
     const res =
       await axios.get(`https://api.mapbox.com/directions/v5/mapbox/driving/${
@@ -73,12 +76,13 @@ const SearchRide = () => {
 &access_token=${import.meta.env.VITE_MAPBOX_ACCESS_TOKEN}`);
     setDirectionData(res.data);
   };
+
   return (
     <>
       <Navbar />
-      <div className="bg-secondary w-[100%] h-[100%] flex flex-col md:flex-row gap-x-3 p-6 gap-y-6">
+      <div className=" bg-secondary w-[100%] h-[100vh] flex flex-col md:flex-row gap-x-3 p-6 gap-y-6">
         <SelectDestination />
-        <div className="w-full bg-white h-[100vh]  rounded-lg">
+        <div className="w-full bg-white h-full rounded-lg relative">
           {mapLoaded && (
             <ReactMapGL
               ref={mapRef}
@@ -126,6 +130,22 @@ const SearchRide = () => {
               />
             </ReactMapGL>
           )}
+        <div className="absolute right-4 top-4 bg-primary  px-3 py-1 ">
+          {directionData?.routes[0] && (
+            <div>
+              <h2 className="text-white">
+                Distance: 
+                <span className="font-bold mr-3 text-white">
+                   {(directionData.routes[0].distance / 1000).toFixed(2)}
+                KM
+                </span>
+                Duration:<span className="font-bold">
+                  {(directionData.routes[0].duration/60).toFixed(2)} Min
+                </span>
+              </h2>
+            </div>
+          )}
+        </div>
         </div>
       </div>
     </>
