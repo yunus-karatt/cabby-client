@@ -5,5 +5,6 @@ export default{
   logout:"/logout",
   getCabs:"/cabs",
   registerVehicle:"/vehicle-details",
-  isDriverExistWithMail:"/isexistbyemail"
+  isDriverExistWithMail:"/isexistbyemail",
+  changeAvailability:'/set-availability'
 }
