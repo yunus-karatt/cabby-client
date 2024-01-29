@@ -3,5 +3,6 @@ export default{
   registerUser:'/register',
   isUserExistWithMail:'/getuserbymail',
   logout:"/logout",
-  loginWithMobile:'/login'
+  loginWithMobile:'/login',
+  listCabs:"/list-cabs"
 }

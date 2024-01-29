@@ -39,7 +39,6 @@ const Navbar = () => {
     if (isMediumScreen) {
       setIsOpen(false);
     }
-    console.log(userInfo)
   }, [isMediumScreen,userInfo]);
 
   return (

@@ -37,7 +37,7 @@ const VehicleInput = () => {
     
     console.log(vehicleDetails.imag1,vehicleDetails.imag2,vehicleDetails.type)
     const data = {
-      id: driverInfo._id,
+      id: driverInfo.id,
       aadhar: {
         aadharId: aadhar?.number,
         aadharImage: aadhar?.photo,

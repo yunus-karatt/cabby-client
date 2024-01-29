@@ -24,7 +24,7 @@ const OtpInputGroup = ({
 }: {
   number: string;
   role: "user" | "admin" | "driver";
-  data:{firstName?:string,lastName?:string,email?:string,mobile:string,_id:string,name?:string}|null
+  data:{cabModel?:string,firstName?:string,lastName?:string,email?:string,mobile:string,id:string,name?:string}|null
 }) => {
 
   const dispatch=useDispatch()
@@ -76,6 +76,7 @@ const OtpInputGroup = ({
             if (!data) {
               navigate("/signup", { state: number });
             } else {
+              console.log({data})
               dispatch(setUserCredentials(data))
               setIsLoading(true)
               const res=await userAxios.post(userApi.loginWithMobile, { mobile: number });
