@@ -8,17 +8,21 @@ import { logout } from "../../services/redux/slices/driverAuthSlice";
 import { driverAxios } from "../../constraints/axios/driverAxios";
 import driverApi from "../../constraints/api/driverApi";
 import { Socket, io } from "socket.io-client";
+import axios from "axios";
 
 const DriverHeader = () => {
   const { driverInfo } = useSelector((state: rootState) => state.driverAuth);
   const [isActive, setActive] = useState(false);
   const [showDiv, setShowDiv] = useState(false);
-  const[socketIO,setSocketIO]=useState<Socket|null>()
+  const [socketIO, setSocketIO] = useState<Socket | null>();
+
   const dispatch = useDispatch();
 
   const handleActive = async () => {
-    console.log(driverInfo.id)
-    const res = await driverAxios.put(driverApi.changeAvailability,{id: driverInfo.id});
+    console.log(driverInfo.id);
+    const res = await driverAxios.put(driverApi.changeAvailability, {
+      id: driverInfo.id,
+    });
     console.log({ res });
     setActive(() => res.data);
   };
@@ -33,26 +37,72 @@ const DriverHeader = () => {
       dispatch(logout());
     }
   };
+  const getLiveCoordinates = () => {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const coordinates = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          };
+          resolve(coordinates);
+        },
+        (error) => {
+          reject(error);
+        }
+      );
+    });
+  };
 
-  useEffect(()=>{
-    const socket=io(import.meta.env.VITE_SOCKET_SERVER,{
-      transports: ["websocket"]
-    })
-    setSocketIO(socket)
-    if(socket){
-      socket.on("connect",()=>{
-        console.log("connected to socket")
-      })
+  const getDistance = async (
+    source: { lat: number; long: number },
+    destination: { lat: number; long: number }
+  ) => {
+    const res =
+      await axios.get(`https://api.mapbox.com/directions/v5/mapbox/driving/${
+        source.long
+      },${source.lat};${destination.long},${
+        destination.lat
+      }?overview=full&geometries=geojson
+&access_token=${import.meta.env.VITE_MAPBOX_ACCESS_TOKEN}`);
+    return parseFloat((res.data.routes[0].distance / 1000).toFixed(2));
+  };
+
+  useEffect(() => {
+    const socket = io(import.meta.env.VITE_SOCKET_SERVER, {
+      transports: ["websocket"],
+    });
+    setSocketIO(socket);
+    if (socket) {
+      socket.on("connect", () => {
+        console.log("socket connected");
+      });
+    } else {
+      console.log("cannot connect");
     }
-    else{
-      console.log("cannot connect")
-    }
-    return()=>{
-      socket.disconnect()
-      socketIO?.disconnect()
-      setSocketIO(null)
-    }
-  },[])
+    return () => {
+      socket.disconnect();
+      socketIO?.disconnect();
+      setSocketIO(null);
+    };
+  }, []);
+
+
+  if (socketIO) {
+    socketIO.on("getDriverCoordinates", async (data) => {
+      const coordinates: any = await getLiveCoordinates();
+      // setLocation(coordinates);
+      const source = { lat: coordinates.lat, long: coordinates.lng };
+      const destination = { lat: data.lat, long: data.long };
+      const distance = await getDistance(source, destination);
+      if (distance <= 5 && driverInfo.cabModel === data.cabId) {
+        socketIO.emit("driverDistance", {
+          distance,
+          driverId: driverInfo.id,
+        });
+      }
+    });
+  }
 
   return (
     <>

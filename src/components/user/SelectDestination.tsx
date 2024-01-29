@@ -5,17 +5,18 @@ import {
   setDestinationCoordinates,
   setSourceCoordinates,
 } from "../../services/redux/slices/userCoordinates";
-import { rootState } from "../../interface/user/userInterface";
+// import { rootState } from "../../interface/user/userInterface";
+import { toast } from "react-toastify";
 // import { LocationSuggestion } from "../../interface/user/userInterface";
 
-export const SelectDestination = () => {
+export const SelectDestination = ({setShowCabs}:{setShowCabs:React.Dispatch<React.SetStateAction<boolean>>}) => {
   // const [from, setFrom] = useState<number[]>([]);
   // const [to, setTo] = useState<number[]>([]);
   const dispatch = useDispatch();
 
-  const { destination, source } = useSelector(
-    (state: rootState) => state.routeCoordinates
-  );
+  // const { destination, source } = useSelector(
+  //   (state: rootState) => state.routeCoordinates
+  // );
   const [sourceL, setSource] = useState<{
     place_name: string;
     lat: number;
@@ -42,8 +43,6 @@ export const SelectDestination = () => {
 
   const getAddressList = async () => {
     try{
-
-    
     if (
       (sourceL && sourceL.place_name) ||
       (destinationL && destinationL.place_name)
@@ -97,8 +96,15 @@ export const SelectDestination = () => {
   };
 
   const handleSearch = () => {
-    console.log(destination);
-    console.log(source);
+    if(sourceL.lat == destinationL.lat && sourceL.long == destinationL.long){
+      toast.error("Please check you selected locations")
+    }
+    setShowCabs(true)
+    // console.log({source,destination})
+    // socket?.emit("searchCabs",({
+    //   source,
+    //   destination
+    // }))
   };
 
   useEffect(() => {
@@ -109,7 +115,7 @@ export const SelectDestination = () => {
   }, [sourceL, destinationL]);
 
   return (
-    <div className=" md:w-1/4 bg-white h-fit rounded-lg flex flex-col p-5 gap-y-3">
+    <div className=" bg-white h-fit rounded-lg flex flex-col p-5 gap-y-3">
       <h1 className="font-bold  text-xl">Get A Ride</h1>
       <div className="relative">
         <input

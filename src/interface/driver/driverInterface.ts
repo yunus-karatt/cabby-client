@@ -3,6 +3,7 @@ export interface Driver {
   firstName: string;
   lastName: string;
   mobile: string;
+  cabModel:string
 }
 
 export interface DriverData {

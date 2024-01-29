@@ -56,7 +56,6 @@ const Auth: React.FC = () => {
     });
     if (response.data) {
       setDriver(response.data);
-      // dispatch(setCredentials(driver));
     } 
     sendOtp();
   };
