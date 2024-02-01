@@ -12,15 +12,12 @@ import Pagination from "../../components/common/Pagination";
 const Drivers = () => {
   const [drivers, setDrivers] = useState<DriverData[]>([]);
   const [totalPage, setTotalPage] = useState<number>();
-  // const [itPageNum, setItPageNum] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>();
   const [searchTPage, setSearchTpage] = useState<number>();
   const [searchCpage, setSearchCpage] = useState<number>(1);
-  // const changePage = (page: number) => {
-  //   setCurrentPage(() => page);
-  // };
+  
 
   const changeSearchQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -75,10 +72,7 @@ const Drivers = () => {
         );
         setDrivers(() => data.data.drivers);
         setTotalPage(() => data.data.totalPage);
-        // totalPage &&
-        //   setItPageNum(() =>
-        //     Array.from({ length: totalPage }, (_, index) => index + 1)
-        //   );
+        
       } catch (error) {
         console.log((error as Error).message);
       } finally {
@@ -171,7 +165,7 @@ const Drivers = () => {
                           </td>
                           <td className="px-6 py-4">{driver.email}</td>
                           <td className="px-6 py-4">
-                            {driver.cabModel.cabType}
+                            {driver.cabModel[0].cabType}
                           </td>
                           <td className="px-6 py-4">$2999</td>
                           <td className="px-6 py-4 text-right">
@@ -201,60 +195,7 @@ const Drivers = () => {
                       totalPage={totalPage}
                     />
                   )
-                  // <nav
-                  //   aria-label="Page navigation example"
-                  //   className="flex justify-center my-5"
-                  // >
-                  //   <ul className="flex items-center -space-x-px h-8 text-sm">
-                  //     <li>
-                  //       <button
-                  //         type="button"
-                  //         className={`${
-                  //           currentPage == 1
-                  //             ? "opacity-50 cursor-not-allowed"
-                  //             : ""
-                  //         } flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
-                  //         disabled={currentPage === 1}
-                  //         onClick={() => changePage(currentPage - 1)}
-                  //       >
-                  //         <span className="sr-only">Previous</span>
-                  //         <ChevronLeft />
-                  //       </button>
-                  //     </li>
-
-                  //     {itPageNum.map((page) => {
-                  //       return (
-                  //         <li key={page}>
-                  //           <button
-                  //             className={`flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700  dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white ${
-                  //               currentPage === page
-                  //                 ? "dark:bg-gray-700"
-                  //                 : "dark:bg-gray-800"
-                  //             }`}
-                  //             onClick={() => changePage(page)}
-                  //           >
-                  //             {page}
-                  //           </button>
-                  //         </li>
-                  //       );
-                  //     })}
-
-                  //     <li>
-                  //       <button
-                  //       disabled={currentPage === totalPage}
-                  //         className={`${
-                  //           currentPage == totalPage
-                  //             ? "opacity-50 cursor-not-allowed"
-                  //             : ""
-                  //         } flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
-                  //         onClick={() => changePage(currentPage + 1)}
-                  //       >
-                  //         <span className="sr-only">Next</span>
-                  //         <ChevronRight />
-                  //       </button>
-                  //     </li>
-                  //   </ul>
-                  // </nav>
+                  
                 }
                 {searchTPage && (
                   <Pagination

@@ -6,5 +6,8 @@ export default{
   getCabs:"/cabs",
   registerVehicle:"/vehicle-details",
   isDriverExistWithMail:"/isexistbyemail",
-  changeAvailability:'/set-availability'
+  changeAvailability:'/set-availability',
+  postRejectionReason:'/rejection-reason',
+  goOffline:'/go-offline',
+  getUserData:'/get-user'
 }

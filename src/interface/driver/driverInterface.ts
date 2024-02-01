@@ -3,7 +3,7 @@ export interface Driver {
   firstName: string;
   lastName: string;
   mobile: string;
-  cabModel:string
+  cabModel: string;
 }
 
 export interface DriverData {
@@ -35,6 +35,29 @@ export interface DriverData {
   joinedAt: string;
   __v: number;
   cabModel: {
-    cabType:string
+    cabType: string;
+  }[];
+}
+
+export interface RideData {
+  status: string;
+  _id: string;
+  userId: string;
+  sourceCoordinates: {
+    latitude: number;
+    longitude: number;
   };
+  destinationCoordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  sourceLocation: string;
+  destinationLocation: string;
+  distance: number;
+  price: number;
+  feedback?: string;
+  rating?: number;
+  duration: number;
+  date:Date,
+  driverId?:string
 }

@@ -11,8 +11,8 @@ export default {
         "secondary":"#D4CACD",
         "hover":"#EEEEEE",
         "text-secondary":"#6B6B6B",
-        "danger":"#ff0000",
-        "success":"#00cc66"
+        "danger":"#8b0000",
+        "success":"#033500"
       },
       keyframes:{
         slideDown:{

@@ -30,7 +30,7 @@ const Home: React.FC = () => {
                 placeholder="Enter Destination"
               />
             </div>
-            <Link to="" className="bg-secondary p-2 rounded-lg">
+            <Link to="/search-ride" className="bg-secondary p-2 rounded-lg">
               See Prices
             </Link>
           </div>

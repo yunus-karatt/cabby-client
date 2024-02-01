@@ -31,7 +31,7 @@ const SearchRide = () => {
   const { source, destination } = useSelector(
     (state: rootState) => state.routeCoordinates
   );
-  const[showCabs,setShowCabs]=useState<boolean>(false)
+  const [showCabs, setShowCabs] = useState<boolean>(false);
 
   const getUserLocation = () => {
     navigator.geolocation.getCurrentPosition((pos) => {
@@ -110,13 +110,19 @@ const SearchRide = () => {
         <div className="md:flex-shrink-0 md:w-1/4">
           <SelectDestination setShowCabs={setShowCabs} />
         </div>
-        {showCabs &&
-        <div className="md:flex-shrink-0 md:w-1/3">
-          <ListCabs socketIO={socketIO} duration={(directionData.routes[0].duration / 60).toFixed(2)} distance={parseFloat((directionData?.routes[0].distance / 1000).toFixed(2))}/>
-        </div>
-        }
-          {mapLoaded && (
-        <div className="w-full bg-white rounded-lg relative">
+        {showCabs && (
+          <div className="md:flex-shrink-0 md:w-1/3">
+            <ListCabs
+              socketIO={socketIO}
+              duration={(directionData.routes[0].duration / 60).toFixed(2)}
+              distance={parseFloat(
+                (directionData?.routes[0].distance / 1000).toFixed(2)
+              )}
+            />
+          </div>
+        )}
+        {mapLoaded && (
+          <div className="w-full h-full bg-white rounded-lg relative">
             <ReactMapGL
               ref={mapRef}
               mapboxAccessToken={import.meta.env.VITE_MAPBOX_ACCESS_TOKEN}
@@ -162,25 +168,25 @@ const SearchRide = () => {
                 }
               />
             </ReactMapGL>
-          
-          <div className="absolute right-4 top-4 bg-primary  px-3 py-1 ">
-            {directionData?.routes[0] && (
-              <div>
-                <h2 className="text-white">
-                  Distance:
-                  <span className="font-bold mr-3 text-white">
-                    {(directionData.routes[0].distance / 1000).toFixed(2)}
-                    KM
-                  </span>
-                  Duration:
-                  <span className="font-bold">
-                    {(directionData.routes[0].duration / 60).toFixed(2)} Min
-                  </span>
-                </h2>
-              </div>
-            )}
+
+            <div className="absolute right-4 top-4 bg-primary  px-3 py-1 ">
+              {directionData?.routes[0] && (
+                <div>
+                  <h2 className="text-white">
+                    Distance:
+                    <span className="font-bold mr-3 text-white">
+                      {(directionData.routes[0].distance / 1000).toFixed(2)}
+                      KM
+                    </span>
+                    Duration:
+                    <span className="font-bold">
+                      {(directionData.routes[0].duration / 60).toFixed(2)} Min
+                    </span>
+                  </h2>
+                </div>
+              )}
             </div>
-        </div>
+          </div>
         )}
       </div>
     </div>
