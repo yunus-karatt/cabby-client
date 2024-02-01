@@ -23,7 +23,7 @@ export interface rootState {
   userAuth: UserAuthSlice;
   adminAuth: AdminAuthSlice;
   driverAuth: DriverAuthSlice;
-  routeCoordinates:RouteCoordinates;
+  routeCoordinates: RouteCoordinates;
 }
 
 export interface UserData {
@@ -47,9 +47,11 @@ export interface RouteCoordinates {
   source: {
     lat: number;
     long: number;
+    placeName: string;
   };
   destination: {
     lat: number;
     long: number;
+    placeName: string;
   };
 }

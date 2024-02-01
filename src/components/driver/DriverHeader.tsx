@@ -1,6 +1,6 @@
 import { Bell, ChevronDown, LogOut, Menu, User } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { rootState } from "../../interface/user/userInterface";
 import { useSidebarContext } from "../../context/SidebarContext";
 import { useEffect, useState } from "react";
@@ -9,14 +9,24 @@ import { driverAxios } from "../../constraints/axios/driverAxios";
 import driverApi from "../../constraints/api/driverApi";
 import { Socket, io } from "socket.io-client";
 import axios from "axios";
+import { RideData } from "../../interface/driver/driverInterface";
+import ConfirmPopup from "../common/ConfirmPopup";
+import GetInputPop from "../common/GetInputPop";
+import RideRequestPopup from "./RideRequestPopup";
 
 const DriverHeader = () => {
   const { driverInfo } = useSelector((state: rootState) => state.driverAuth);
   const [isActive, setActive] = useState(false);
   const [showDiv, setShowDiv] = useState(false);
   const [socketIO, setSocketIO] = useState<Socket | null>();
+  const [rideData, setRideData] = useState<RideData | null>(null);
+  const [confirmPopup, setConfrimPopup] = useState<boolean>(false);
+  const [rejectionReason, setRejectionReason] = useState<string>("");
+  const [inputPop, setInputPop] = useState<boolean>(false);
+  const [rideRequestPop, setRideRequestPop] = useState<boolean>(false);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleActive = async () => {
     console.log(driverInfo.id);
@@ -32,12 +42,14 @@ const DriverHeader = () => {
   };
 
   const handleLogOut = async () => {
-    const res = await driverAxios.post(driverApi.logout);
+    const res = await driverAxios.post(
+      `${driverApi.logout}?id=${driverInfo.id}`
+    );
     if (res.data) {
       dispatch(logout());
     }
   };
-  const getLiveCoordinates = () => {
+  const getLiveCoordinates = (): Promise<{ lat: number; lng: number }> => {
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
@@ -68,6 +80,19 @@ const DriverHeader = () => {
     return parseFloat((res.data.routes[0].distance / 1000).toFixed(2));
   };
 
+  const submitRejection = async () => {
+    const res = await driverAxios.post(driverApi.postRejectionReason, {
+      driverId: driverInfo.id,
+      rideId: rideData?._id,
+      reason: rejectionReason,
+    });
+    console.log({ res });
+  };
+
+  const unloadHandler = async () => {
+    await driverAxios.get(`${driverApi.goOffline}?id=${driverInfo.id}`);
+  };
+
   useEffect(() => {
     const socket = io(import.meta.env.VITE_SOCKET_SERVER, {
       transports: ["websocket"],
@@ -87,10 +112,19 @@ const DriverHeader = () => {
     };
   }, []);
 
+  // for tab closing
+
+  useEffect(() => {
+    window.addEventListener("unload", unloadHandler);
+    return () => {
+      window.removeEventListener("unload", unloadHandler);
+    };
+  }, []);
 
   if (socketIO) {
     socketIO.on("getDriverCoordinates", async (data) => {
-      const coordinates: any = await getLiveCoordinates();
+      const coordinates: { lat: number; lng: number } =
+        await getLiveCoordinates();
       // setLocation(coordinates);
       const source = { lat: coordinates.lat, long: coordinates.lng };
       const destination = { lat: data.lat, long: data.long };
@@ -99,14 +133,44 @@ const DriverHeader = () => {
         socketIO.emit("driverDistance", {
           distance,
           driverId: driverInfo.id,
+          rideId: data.rideId,
+          duration: data.duration,
         });
       }
     });
+    socketIO.on(
+      "getDriverConfirmation",
+      (data: { driverId: string; rideData: RideData }) => {
+        if (data.driverId === driverInfo.id) setRideData(data.rideData);
+        setRideRequestPop(true);
+      }
+    );
   }
+
+  const accepetRideRequest = () => {
+    setRideRequestPop(false);
+    socketIO?.emit("approveRide", { ...rideData, driverId: driverInfo.id });
+    navigate("/driver/current-ride", { state: rideData });
+  };
+
+  const rejectRideRequest = (timeout = false) => {
+    setRideRequestPop(false);
+    if (!timeout) {
+      setConfrimPopup(true);
+    }
+    if (timeout) {
+      setInputPop(true);
+    }
+    socketIO?.emit("rejectRide", { ...rideData });
+  };
 
   return (
     <>
-      <nav className="pt-2  bg-primary text-white items-center w-full overflow-x-hidden">
+      <nav
+        className={`pt-2  bg-primary text-white items-center w-full overflow-x-hidden ${
+          rideData || (confirmPopup && "blur")
+        }`}
+      >
         <div className="items-center flex justify-between mx-8 p-2">
           <PageHeaderFirstSection />
           <div className="flex gap-x-10 items-center">
@@ -162,6 +226,27 @@ const DriverHeader = () => {
           </div>
         </div>
       </nav>
+      {rideRequestPop && rideData && (
+        <RideRequestPopup
+          rideData={rideData}
+          acceptRideRequest={accepetRideRequest}
+          rejectRideRequest={rejectRideRequest}
+        />
+      )}
+      {confirmPopup && (
+        <ConfirmPopup
+          setNextPopup={setInputPop}
+          setConfirmPop={setConfrimPopup}
+        />
+      )}
+      {inputPop && (
+        <GetInputPop
+          input={rejectionReason}
+          setInput={setRejectionReason}
+          setInputPop={setInputPop}
+          submit={submitRejection}
+        />
+      )}
     </>
   );
 };

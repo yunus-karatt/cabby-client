@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   setDestinationCoordinates,
   setSourceCoordinates,
@@ -9,7 +9,11 @@ import {
 import { toast } from "react-toastify";
 // import { LocationSuggestion } from "../../interface/user/userInterface";
 
-export const SelectDestination = ({setShowCabs}:{setShowCabs:React.Dispatch<React.SetStateAction<boolean>>}) => {
+export const SelectDestination = ({
+  setShowCabs,
+}: {
+  setShowCabs: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   // const [from, setFrom] = useState<number[]>([]);
   // const [to, setTo] = useState<number[]>([]);
   const dispatch = useDispatch();
@@ -42,36 +46,38 @@ export const SelectDestination = ({setShowCabs}:{setShowCabs:React.Dispatch<Reac
   >([]);
 
   const getAddressList = async () => {
-    try{
-    if (
-      (sourceL && sourceL.place_name) ||
-      (destinationL && destinationL.place_name)
-    ) {
-      const query = sourceChange ? sourceL.place_name : destinationL.place_name;
-      const res = await axios.get(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json`,
-        {
-          params: {
-            access_token: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
-            country: "in",
-          },
-        }
-      );
-      setAddressList(() => {
-        return res.data.features.map((data: any) => {
-          return {
-            place_name: data.place_name,
-            lat: data.geometry.coordinates[1],
-            long: data.geometry.coordinates[0],
-          };
+    try {
+      if (
+        (sourceL && sourceL.place_name) ||
+        (destinationL && destinationL.place_name)
+      ) {
+        const query = sourceChange
+          ? sourceL.place_name
+          : destinationL.place_name;
+        const res = await axios.get(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json`,
+          {
+            params: {
+              access_token: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
+              country: "in",
+            },
+          }
+        );
+        setAddressList(() => {
+          return res.data.features.map((data: any) => {
+            return {
+              place_name: data.place_name,
+              lat: data.geometry.coordinates[1],
+              long: data.geometry.coordinates[0],
+            };
+          });
         });
-      });
-    } else {
-      console.log("no sourceL");
+      } else {
+        console.log("no sourceL");
+      }
+    } catch (error) {
+      console.log(error);
     }
-  }catch(error){
-    console.log(error)
-  }
   };
 
   const onSourceAddressClick = (
@@ -81,7 +87,7 @@ export const SelectDestination = ({setShowCabs}:{setShowCabs:React.Dispatch<Reac
   ) => {
     setAddressList([]);
     setSource(() => ({ place_name, lat, long }));
-    dispatch(setSourceCoordinates({ lat, long }));
+    dispatch(setSourceCoordinates({ lat, long, placeName: place_name }));
     setSourceChange(false);
   };
   const onDestinationAddressClick = (
@@ -91,15 +97,15 @@ export const SelectDestination = ({setShowCabs}:{setShowCabs:React.Dispatch<Reac
   ) => {
     setAddressList([]);
     setDestination({ place_name, lat, long });
-    dispatch(setDestinationCoordinates({ lat, long }));
-    setDestinationChange(false)
+    dispatch(setDestinationCoordinates({ lat, long, placeName: place_name }));
+    setDestinationChange(false);
   };
 
   const handleSearch = () => {
-    if(sourceL.lat == destinationL.lat && sourceL.long == destinationL.long){
-      toast.error("Please check you selected locations")
+    if (sourceL.lat == destinationL.lat && sourceL.long == destinationL.long) {
+      toast.error("Please check you selected locations");
     }
-    setShowCabs(true)
+    setShowCabs(true);
     // console.log({source,destination})
     // socket?.emit("searchCabs",({
     //   source,
@@ -156,9 +162,9 @@ export const SelectDestination = ({setShowCabs}:{setShowCabs:React.Dispatch<Reac
           type="text"
           placeholder={`Dropoff location`}
           value={destinationL.place_name}
-          onChange={(e) =>{
+          onChange={(e) => {
             setDestinationChange(true);
-            setDestination((prev) => ({ ...prev, place_name: e.target.value }))
+            setDestination((prev) => ({ ...prev, place_name: e.target.value }));
           }}
         />
         {addressList.length > 0 && destinationChange && (

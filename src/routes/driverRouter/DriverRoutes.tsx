@@ -6,6 +6,7 @@ import Signup from "../../screens/driver/Signup";
 import VehicleInput from "../../screens/driver/VehicleInput";
 import DriverPrivateRoutes from "./DriverPrivateRoutes";
 import DriverPublicRoute from "./DriverPublicRoute";
+import CurrentRide from "../../screens/driver/CurrentRide";
 
 const DriverRoutes: React.FC = () => {
   return (
@@ -18,6 +19,7 @@ const DriverRoutes: React.FC = () => {
       <Route path="/vehicle-registration" element={<VehicleInput />} />
       <Route path="" element={<DriverPrivateRoutes />}>
         <Route index element={<DriverDashboard />} />
+        <Route path="/current-ride" element={<CurrentRide />} />
       </Route>
     </Routes>
   );
