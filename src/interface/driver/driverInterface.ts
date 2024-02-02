@@ -36,6 +36,7 @@ export interface DriverData {
   __v: number;
   cabModel: {
     cabType: string;
+    
   }[];
 }
 
