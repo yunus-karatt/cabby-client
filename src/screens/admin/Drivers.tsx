@@ -8,6 +8,7 @@ import Loader from "../../components/common/Loader";
 import Swal from "sweetalert2";
 import { DriverData } from "../../interface/driver/driverInterface";
 import Pagination from "../../components/common/Pagination";
+import DriverDetails from "../../components/admin/DriverDetails";
 
 const Drivers = () => {
   const [drivers, setDrivers] = useState<DriverData[]>([]);
@@ -17,7 +18,8 @@ const Drivers = () => {
   const [searchQuery, setSearchQuery] = useState<string>();
   const [searchTPage, setSearchTpage] = useState<number>();
   const [searchCpage, setSearchCpage] = useState<number>(1);
-  
+  const [isDriverDetails, setIsDriverDetails] = useState<boolean>(false);
+  const [driver, setDriver] = useState<DriverData | null>(null);
 
   const changeSearchQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -30,7 +32,7 @@ const Drivers = () => {
         `${adminApi.searchDriver}?search=${searchQuery}&&?page=${searchCpage}`
       );
       const { driver, totalPage } = res.data;
-      console.log({driver})
+      console.log({ driver });
       setDrivers(() => driver);
       setSearchTpage(() => totalPage);
     } catch (error) {
@@ -63,6 +65,13 @@ const Drivers = () => {
       }
     });
   };
+
+  const viewDriverData = (id: string) => {
+    setIsDriverDetails(true);
+    const driver = drivers.find((data) => data._id === id);
+    if (driver) setDriver(() => driver);
+  };
+
   useEffect(() => {
     async function fetchUsers() {
       try {
@@ -72,7 +81,6 @@ const Drivers = () => {
         );
         setDrivers(() => data.data.drivers);
         setTotalPage(() => data.data.totalPage);
-        
       } catch (error) {
         console.log((error as Error).message);
       } finally {
@@ -89,12 +97,25 @@ const Drivers = () => {
         <SideBar />
         <div className="bg-hover w-full flex flex-col gap-y-5">
           <div className="md:p-5 mx-2">
-            <h1 className="font-bold text-4xl">Drivers</h1>
+            {isDriverDetails ? (
+              <h1 className="font-bold text-4xl">
+                <span
+                  className="text-text-secondary cursor-pointer"
+                  onClick={() => setIsDriverDetails(false)}
+                >
+                  {" "}
+                  Drivers/
+                </span>
+                Driver-Details
+              </h1>
+            ) : (
+              <h1 className="font-bold text-4xl">Drivers</h1>
+            )}
           </div>
           <div className="mx-2 flex items-center gap-x-5">
             <div className="flex items-center bg-white p-3 rounded-lg">
               <input
-              className="outline-none"
+                className="outline-none"
                 type="search"
                 placeholder="search..."
                 onChange={changeSearchQuery}
@@ -112,101 +133,110 @@ const Drivers = () => {
               </select>
             </div> */}
           </div>
-          <div className="bg-white h-[100vh] mx-2 rounded-md p-10 flex justify-center ">
-            {loading ? (
-              <Loader />
-            ) : (
-              <div className="relative overflow-x-auto shadow-md sm:rounded-lg h-fit">
-                <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
-                  <thead className="text-xs text-black uppercase bg-secondary ">
-                    <tr>
-                      <th scope="col" className="px-6 py-3">
-                        Sr.No.
-                      </th>
-                      <th scope="col" className="px-6 py-3">
-                        Name
-                      </th>
-                      <th scope="col" className="px-6 py-3">
-                        Mobile
-                      </th>
-                      <th scope="col" className="px-6 py-3">
-                        Email
-                      </th>
-                      <th scope="col" className="px-6 py-3">
-                        Cab Model
-                      </th>
-                      <th scope="col" className="px-6 py-3">
-                        Total Trips
-                      </th>
-                      <th scope="col" className="px-6 py-3">
-                        <span className="sr-only">Edit</span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {drivers.map((driver, index) => {
-                      return (
-                        <tr
-                          key={driver._id}
-                          className="bg-white border-b   text-black hover:bg-gray-600 hover:text-white"
-                        >
-                          <td className="px-6 py-4">{index + 1}</td>
-
-                          <th
-                            scope="row"
-                            className="px-6 py-4 font-medium  whitespace-nowrap "
+          {isDriverDetails && driver ? (
+            <DriverDetails driverData={driver} />
+          ) : (
+            <div className="bg-white h-[100vh] mx-2 rounded-md p-10 flex justify-center ">
+              {loading ? (
+                <Loader />
+              ) : (
+                <div className="relative overflow-x-auto shadow-md sm:rounded-lg h-fit w-full">
+                  <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
+                    <thead className="text-xs text-black uppercase bg-secondary ">
+                      <tr>
+                        <th scope="col" className="px-6 py-3">
+                          Sr.No.
+                        </th>
+                        <th scope="col" className="px-6 py-3">
+                          Name
+                        </th>
+                        <th scope="col" className="px-6 py-3">
+                          Mobile
+                        </th>
+                        <th scope="col" className="px-6 py-3">
+                          Email
+                        </th>
+                        <th scope="col" className="px-6 py-3">
+                          Cab Model
+                        </th>
+                        <th scope="col" className="px-6 py-3">
+                          Total Trips
+                        </th>
+                        <th scope="col" className="px-6 py-3">
+                          <span className="sr-only">Edit</span>
+                        </th>
+                        <th scope="col" className="px-6 py-3">
+                          <span className="sr-only">View</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {drivers.map((driver, index) => {
+                        return (
+                          <tr
+                            onClick={() => viewDriverData(driver._id)}
+                            key={driver._id}
+                            className="bg-white border-b cursor-pointer  text-black hover:bg-gray-600 hover:text-white"
                           >
-                            {driver.firstName + " " + driver.lastName}
-                          </th>
-                          <td className="px-6 py-4">
-                            {driver.mobile
-                              ? driver.mobile
-                              : "Mobile Not provided"}
-                          </td>
-                          <td className="px-6 py-4">{driver.email}</td>
-                          <td className="px-6 py-4">
-                            {driver.cabModel[0].cabType}
-                          </td>
-                          <td className="px-6 py-4">$2999</td>
-                          <td className="px-6 py-4 text-right">
-                            <p
-                              onClick={() =>
-                                handleBlock(driver._id, driver.isBlocked)
-                              }
-                              className={`cursor-pointer font-medium  hover:underline ${
-                                driver.isBlocked
-                                  ? "text-success"
-                                  : "text-danger"
-                              }`}
+                            <td className="px-6 py-4">{index + 1}</td>
+
+                            <th
+                              scope="row"
+                              className="px-6 py-4 font-medium  whitespace-nowrap "
                             >
-                              {driver.isBlocked ? "unblock" : "block"}
-                            </p>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-                {
-                  !loading && !searchTPage && (
+                              {driver.firstName + " " + driver.lastName}
+                            </th>
+                            <td className="px-6 py-4">
+                              {driver.mobile
+                                ? driver.mobile
+                                : "Mobile Not provided"}
+                            </td>
+                            <td className="px-6 py-4">{driver.email}</td>
+                            <td className="px-6 py-4">
+                              {driver.cabModel[0].cabType}
+                            </td>
+                            <td className="px-6 py-4">$2999</td>
+                            <td className="px-6 py-4 text-right">
+                              <p
+                                onClick={() =>
+                                  handleBlock(driver._id, driver.isBlocked)
+                                }
+                                className={`cursor-pointer font-medium  hover:underline ${
+                                  driver.isBlocked
+                                    ? "text-success"
+                                    : "text-danger"
+                                }`}
+                              >
+                                {driver.isBlocked ? "unblock" : "block"}
+                              </p>
+                            </td>
+                            <td className="text-primary">View More</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  {!loading && !searchTPage && (
                     <Pagination
                       currentPage={currentPage}
                       setCurrentPage={setCurrentPage}
                       totalPage={totalPage}
                     />
-                  )
-                  
-                }
-                {searchTPage && (
-                  <Pagination
-                    currentPage={searchCpage}
-                    setCurrentPage={setSearchCpage}
-                    totalPage={searchTPage}
-                  />
-                )}
-              </div>
-            )}
-          </div>
+                  )}
+                  {searchTPage && (
+                    <Pagination
+                      currentPage={searchCpage}
+                      setCurrentPage={setSearchCpage}
+                      totalPage={searchTPage}
+                    />
+                  )}
+                </div>
+                
+              )}
+              
+            </div>
+          )}
+          
         </div>
       </div>
     </>
