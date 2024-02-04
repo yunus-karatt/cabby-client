@@ -1,59 +1,68 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setDestinationCoordinates,
   setSourceCoordinates,
 } from "../../services/redux/slices/userCoordinates";
 // import { rootState } from "../../interface/user/userInterface";
 import { toast } from "react-toastify";
+import { Socket } from "socket.io-client";
+import { rootState } from "../../interface/user/userInterface";
 // import { LocationSuggestion } from "../../interface/user/userInterface";
 
 export const SelectDestination = ({
-  setShowCabs,
+  // setShowCabs,
+  socketIO,
+  distance,
+  duration
 }: {
-  setShowCabs: React.Dispatch<React.SetStateAction<boolean>>;
+  // setShowCabs: React.Dispatch<React.SetStateAction<boolean>>;
+  socketIO: Socket|null;
+  distance: number;
+  duration: string;
 }) => {
-  // const [from, setFrom] = useState<number[]>([]);
-  // const [to, setTo] = useState<number[]>([]);
   const dispatch = useDispatch();
 
-  // const { destination, source } = useSelector(
-  //   (state: rootState) => state.routeCoordinates
-  // );
+  const userId = useSelector((state: rootState) => state.userAuth.userInfo._id);
+
   const [sourceL, setSource] = useState<{
-    place_name: string;
+    placeName: string;
     lat: number;
     long: number;
   }>({
-    place_name: "",
+    placeName: "",
     lat: 0,
     long: 0,
   });
+
   const [sourceChange, setSourceChange] = useState(false);
   const [destinationChange, setDestinationChange] = useState(false);
   const [destinationL, setDestination] = useState<{
-    place_name: string;
+    placeName: string;
     lat: number;
     long: number;
   }>({
-    place_name: "",
+    placeName: "",
     lat: 0,
     long: 0,
   });
+
   const [addressList, setAddressList] = useState<
-    { place_name: string; lat: number; long: number }[]
+    { placeName: string; lat: number; long: number }[]
   >([]);
+  // const [amount, setAmount] = useState<number | null>(null);
+
 
   const getAddressList = async () => {
     try {
       if (
-        (sourceL && sourceL.place_name) ||
-        (destinationL && destinationL.place_name)
+        (sourceL && sourceL.placeName) ||
+        (destinationL && destinationL.placeName)
       ) {
         const query = sourceChange
-          ? sourceL.place_name
-          : destinationL.place_name;
+          ? sourceL.placeName
+          : destinationL.placeName;
         const res = await axios.get(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json`,
           {
@@ -66,7 +75,7 @@ export const SelectDestination = ({
         setAddressList(() => {
           return res.data.features.map((data: any) => {
             return {
-              place_name: data.place_name,
+              placeName: data.place_name,
               lat: data.geometry.coordinates[1],
               long: data.geometry.coordinates[0],
             };
@@ -81,31 +90,45 @@ export const SelectDestination = ({
   };
 
   const onSourceAddressClick = (
-    place_name: string,
+    placeName: string,
     lat: number,
     long: number
   ) => {
     setAddressList([]);
-    setSource(() => ({ place_name, lat, long }));
-    dispatch(setSourceCoordinates({ lat, long, placeName: place_name }));
+    setSource(() => ({ placeName, lat, long }));
+    dispatch(setSourceCoordinates({ lat, long, placeName }));
     setSourceChange(false);
   };
   const onDestinationAddressClick = (
-    place_name: string,
+    placeName: string,
     lat: number,
     long: number
   ) => {
     setAddressList([]);
-    setDestination({ place_name, lat, long });
-    dispatch(setDestinationCoordinates({ lat, long, placeName: place_name }));
+    setDestination({ placeName, lat, long });
+    dispatch(setDestinationCoordinates({ lat, long, placeName }));
     setDestinationChange(false);
   };
 
   const handleSearch = () => {
+    if (!sourceL.lat || !destinationL.lat) {
+      toast.error("Please select Locations");
+      return;
+    }
     if (sourceL.lat == destinationL.lat && sourceL.long == destinationL.long) {
       toast.error("Please check you selected locations");
+      return;
     }
-    setShowCabs(true);
+    socketIO?.emit("getNearByDrivers", {
+      source:sourceL,
+      destination:destinationL,
+      // selectedCabId,
+      duration,
+      distance,
+      // amount,
+      userId,
+    });
+    // setShowCabs(true);
     // console.log({source,destination})
     // socket?.emit("searchCabs",({
     //   source,
@@ -128,10 +151,10 @@ export const SelectDestination = ({
           className="w-full bg-secondary rounded-md p-3 "
           type="text"
           placeholder={`Pickup location`}
-          value={sourceL?.place_name}
+          value={sourceL?.placeName}
           onChange={(e) => {
             setSourceChange(true);
-            setSource((prev) => ({ ...prev, place_name: e.target.value }));
+            setSource((prev) => ({ ...prev, placeName: e.target.value }));
           }}
         />
         {addressList.length > 0 && sourceChange && (
@@ -144,11 +167,11 @@ export const SelectDestination = ({
                 >
                   <h1
                     onClick={() =>
-                      onSourceAddressClick(data.place_name, data.lat, data.long)
+                      onSourceAddressClick(data.placeName, data.lat, data.long)
                     }
                     className=""
                   >
-                    {data.place_name}
+                    {data.placeName}
                   </h1>
                 </div>
               );
@@ -161,10 +184,10 @@ export const SelectDestination = ({
           className="bg-secondary rounded-md p-3 w-full"
           type="text"
           placeholder={`Dropoff location`}
-          value={destinationL.place_name}
+          value={destinationL.placeName}
           onChange={(e) => {
             setDestinationChange(true);
-            setDestination((prev) => ({ ...prev, place_name: e.target.value }));
+            setDestination((prev) => ({ ...prev, placeName: e.target.value }));
           }}
         />
         {addressList.length > 0 && destinationChange && (
@@ -178,14 +201,14 @@ export const SelectDestination = ({
                   <h1
                     onClick={() =>
                       onDestinationAddressClick(
-                        data.place_name,
+                        data.placeName,
                         data.lat,
                         data.long
                       )
                     }
                     className=""
                   >
-                    {data.place_name}
+                    {data.placeName}
                   </h1>
                 </div>
               );

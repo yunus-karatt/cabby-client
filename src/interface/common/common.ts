@@ -39,3 +39,40 @@ export interface CabInteface {
   image: string;
   maxPersons:number
 }
+// interface Coordinate {
+//   coordinates:number[]
+// }
+
+interface Geometry {
+  coordinates: number[][];
+  type: string; // Assuming the type is always "LineString"
+}
+
+interface RouteLeg {
+  via_waypoints: any[]; // Adjust the type if needed
+  admins: any[]; // Adjust the type if needed
+  weight: number;
+  duration: number;
+  steps: any[]; // Adjust the type if needed
+}
+
+interface Route {
+  distance: number;
+  duration: number;
+  geometry: Geometry;
+  legs: RouteLeg[];
+  weight: number;
+  weight_name: string;
+}
+
+// interface Waypoint {
+//   coordinates: Coordinate;
+// }
+
+export interface DirectionsApiResponse {
+  code: string;
+  routes: Route[];
+  uuid: string;
+  // waypoints: Waypoint[];
+}
+

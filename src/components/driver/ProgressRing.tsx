@@ -1,9 +1,9 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-const ProgressRing = ({ counter }:{counter:number}) => {
+const ProgressRing = ({ counter }: { counter: number }) => {
   const [circumference, setCircumference] = useState(0);
 
-  const circleRadius = 30; 
+  const circleRadius = 30;
   const newCircumference = 2 * Math.PI * circleRadius;
   const percent = ((15 - counter) / 15) * 100;
   useEffect(() => {
