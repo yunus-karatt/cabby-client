@@ -37,7 +37,7 @@ const RideRequestPopup = ({
   }, [counter]);
 
   return (
-    <div className="p-3 py-8 w-[400px] h-[500px] bg-white absolute z-50 left-[50%] top-[50%] -translate-x-[50%] -translate-y-[50%]">
+    <div className="p-3 py-8 w-[400px] min-h-[500px] bg-white absolute z-50 left-[50%] top-[50%] -translate-x-[50%] -translate-y-[50%]">
       <div className="flex justify-between items-center">
       <h1 className="font-bold text-xl">New Ride Request</h1>
       <ProgressRing counter={counter}/>

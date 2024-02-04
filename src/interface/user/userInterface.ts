@@ -55,3 +55,41 @@ export interface RouteCoordinates {
     placeName: string;
   };
 }
+
+export interface CurrentRideData {
+  status: string;
+  _id: string;
+  userId: string;
+  sourceCoordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  destinationCoordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  sourceLocation: string;
+  destinationLocation: string;
+  distance: number;
+  price: number;
+  feedback?: string;
+  rating?: number;
+  duration: number;
+  date: Date;
+  driverId?: string;
+  driverData: {
+    cabModel: {
+      cabType: string;
+      image: string;
+      _id: string;
+    }[];
+    email: string;
+    firstName: string;
+    lastName: string;
+  };
+  otp: number;
+  driverCoordinates: {
+    latitude: number;
+    longitude: number;
+  };
+}

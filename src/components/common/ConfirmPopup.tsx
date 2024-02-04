@@ -15,7 +15,7 @@ const ConfirmPopup = ({
   };
 
   return (
-    <div className="absolute bg-white rounded-md border w-[450px] h-[400px] left-[50%] top-[50%] -translate-x-[50%] -translate-y-[50%]">
+    <div className="absolute bg-white rounded-md border w-[450px] h-[400px] left-[50%] top-[50%] -translate-x-[50%] -translate-y-[50%] z-50">
       <div className="">
         <CabbyNav />
       </div>

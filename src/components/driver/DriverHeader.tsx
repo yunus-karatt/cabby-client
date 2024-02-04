@@ -49,13 +49,16 @@ const DriverHeader = () => {
       dispatch(logout());
     }
   };
-  const getLiveCoordinates = (): Promise<{ lat: number; lng: number }> => {
+  const getLiveCoordinates = (): Promise<{
+    latitude: number;
+    longitude: number;
+  }> => {
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const coordinates = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
           };
           resolve(coordinates);
         },
@@ -81,12 +84,12 @@ const DriverHeader = () => {
   };
 
   const submitRejection = async () => {
-    const res = await driverAxios.post(driverApi.postRejectionReason, {
+    await driverAxios.post(driverApi.postRejectionReason, {
       driverId: driverInfo.id,
       rideId: rideData?._id,
       reason: rejectionReason,
     });
-    console.log({ res });
+    setRejectionReason("");
   };
 
   const unloadHandler = async () => {
@@ -123,16 +126,21 @@ const DriverHeader = () => {
 
   if (socketIO) {
     socketIO.on("getDriverCoordinates", async (data) => {
-      const coordinates: { lat: number; lng: number } =
+      const res: { latitude: number; longitude: number } =
         await getLiveCoordinates();
+      let coordinates: { lat: number; lng: number } = {
+        lat: res.latitude,
+        lng: res.longitude,
+      };
       // setLocation(coordinates);
       const source = { lat: coordinates.lat, long: coordinates.lng };
       const destination = { lat: data.lat, long: data.long };
       const distance = await getDistance(source, destination);
-      if (distance <= 5 && driverInfo.cabModel === data.cabId) {
+      if (distance <= 5) {
         socketIO.emit("driverDistance", {
           distance,
           driverId: driverInfo.id,
+          cabId: driverInfo.cabModel,
           rideId: data.rideId,
           duration: data.duration,
         });
@@ -147,9 +155,15 @@ const DriverHeader = () => {
     );
   }
 
-  const accepetRideRequest = () => {
+  const accepetRideRequest = async () => {
+    const driverCoordinates: { latitude: number; longitude: number } =
+      await getLiveCoordinates();
     setRideRequestPop(false);
-    socketIO?.emit("approveRide", { ...rideData, driverId: driverInfo.id });
+    socketIO?.emit("approveRide", {
+      ...rideData,
+      driverId: driverInfo.id,
+      driverCoordinates,
+    });
     navigate("/driver/current-ride", { state: rideData });
   };
 
