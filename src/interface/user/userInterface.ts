@@ -1,3 +1,4 @@
+import { SocketState } from "../../services/redux/slices/driverSocket";
 import { Admin } from "../admin/adminInterface";
 import { Driver } from "../driver/driverInterface";
 
@@ -24,7 +25,10 @@ export interface rootState {
   adminAuth: AdminAuthSlice;
   driverAuth: DriverAuthSlice;
   routeCoordinates: RouteCoordinates;
+  driverSocket:SocketState
 }
+
+
 
 export interface UserData {
   RideDetails: { completedRides: number; cancelledRides: number };

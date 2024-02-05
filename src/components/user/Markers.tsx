@@ -3,6 +3,7 @@ import { rootState } from "../../interface/user/userInterface";
 import { Marker } from "react-map-gl";
 import { Car } from "lucide-react";
 import { useEffect } from "react";
+// import { useEffect } from "react";
 
 const Markers = ({
   sourceProps,
@@ -17,37 +18,37 @@ const Markers = ({
     (state: rootState) => state.routeCoordinates
   );
 
-  useEffect(()=>{
-    console.log(sourceProps?.latitude,destinationProps?.latitude)
-  })
+  useEffect(() => {
+    console.log({ sourceProps, destinationProps });
+  }, [sourceProps]);
+
   return (
     <div>
-      {destination.lat && destination.long && !destinationProps && (
+      {destination.lat && destination.long && !destinationProps?.latitude && (
         <Marker latitude={destination.lat} longitude={destination.long} />
       )}
 
-      {source.lat && source.long && !sourceProps && (
-        <Marker latitude={source.lat} longitude={source.long} />
-      )}
+      {source.lat &&
+        source.long &&
+        !sourceProps?.latitude &&
+        !destinationProps?.latitude && (
+          <Marker latitude={source.lat} longitude={source.long} />
+        )}
 
       {sourceProps?.latitude && sourceProps.longitude && (
         <Marker
           latitude={sourceProps.latitude}
           longitude={sourceProps.longitude}
-        >
-          {icon && <Car />}
-        </Marker>
+        />
       )}
 
       {destinationProps?.latitude && destinationProps.longitude && (
         <Marker
           latitude={destinationProps.latitude}
           longitude={destinationProps.longitude}
-        >
-          {/* {icon && <Car />} */}
-        </Marker>
+        />
+        // {/* </Marker> */}
       )}
-
     </div>
   );
 };
