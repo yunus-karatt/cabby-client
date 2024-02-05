@@ -1,10 +1,10 @@
-import axios from "axios";
 import mapboxgl from "mapbox-gl";
-import { useEffect, useRef, useState } from "react";
-import ReactMapGL, { NavigationControl } from "react-map-gl";
+import { useEffect, useRef } from "react";
+import ReactMapGL, { MapRef, NavigationControl } from "react-map-gl";
 import MapboxRoute from "../user/MapboxRoute";
 import Markers from "../user/Markers";
 import { DirectionsApiResponse } from "../../interface/common/common";
+// import MapboxDirections from "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
@@ -17,11 +17,19 @@ const Map = ({
   destination: { latitude: number; longitude: number };
   directionData?:DirectionsApiResponse
 }) => {
-  const mapRef = useRef(null);
+  const mapRef = useRef<MapRef|null>(null);
 
-  
+  useEffect(()=>{
+    mapRef?.current?.flyTo({
+      center:[
+        source.longitude,
+        source.latitude
+      ],
+      animate:true,
+      duration:1500
+    })
 
-
+  },[source])
 
   return (
     <div className="w-full h-[100%] bg-secondary flex gap-x-4">
@@ -32,18 +40,20 @@ const Map = ({
             initialViewState={{
               latitude: source.latitude,
               longitude: source.longitude,
-              zoom: 15,
+              zoom: 18,
+              
             }}
             mapStyle="mapbox://styles/mapbox/streets-v11"
             
           >
-            <Markers destinationProps={destination} sourceProps={source} />
+            <Markers destinationProps={destination} sourceProps={source} 
+            />
             {directionData?.routes && (
               <MapboxRoute
                 coordinates={directionData?.routes[0]?.geometry?.coordinates}
               />
             )}
-            <NavigationControl position="bottom-right" />
+            <NavigationControl visualizePitch position="bottom-right" />
           
           </ReactMapGL>
         </div>

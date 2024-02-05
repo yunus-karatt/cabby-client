@@ -13,6 +13,7 @@ import { RideData } from "../../interface/driver/driverInterface";
 import ConfirmPopup from "../common/ConfirmPopup";
 import GetInputPop from "../common/GetInputPop";
 import RideRequestPopup from "./RideRequestPopup";
+import { setSocket } from "../../services/redux/slices/driverSocket";
 
 const DriverHeader = () => {
   const { driverInfo } = useSelector((state: rootState) => state.driverAuth);
@@ -29,11 +30,9 @@ const DriverHeader = () => {
   const navigate = useNavigate();
 
   const handleActive = async () => {
-    console.log(driverInfo.id);
     const res = await driverAxios.put(driverApi.changeAvailability, {
       id: driverInfo.id,
     });
-    console.log({ res });
     setActive(() => res.data);
   };
 
@@ -100,6 +99,7 @@ const DriverHeader = () => {
     const socket = io(import.meta.env.VITE_SOCKET_SERVER, {
       transports: ["websocket"],
     });
+    dispatch(setSocket(socket));
     setSocketIO(socket);
     if (socket) {
       socket.on("connect", () => {
