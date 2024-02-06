@@ -1,7 +1,6 @@
 import { useSelector } from "react-redux";
 import { rootState } from "../../interface/user/userInterface";
 import { Marker } from "react-map-gl";
-import { Car } from "lucide-react";
 import { useEffect } from "react";
 // import { useEffect } from "react";
 
@@ -18,9 +17,6 @@ const Markers = ({
     (state: rootState) => state.routeCoordinates
   );
 
-  useEffect(() => {
-    console.log({ sourceProps, destinationProps });
-  }, [sourceProps]);
 
   return (
     <div>

@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+// import { useEffect } from "react";
 import { Layer, Source } from "react-map-gl";
 
 const MapboxRoute = ({coordinates}:{coordinates:number[][]}) => {
-  useEffect(()=>console.log('route',{coordinates}))
+  // useEffect(()=>console.log('route',{coordinates}))
   return (
     <Source
       type="geojson"

@@ -40,7 +40,7 @@ export interface CabInteface {
   maxPersons: number;
 }
 
-interface Geometry {
+export interface Geometry {
   coordinates: [number, number][];
   type: string;
 }
@@ -48,6 +48,15 @@ interface Geometry {
 export interface Maneuver {
   instruction: string;
   location: [number, number];
+}
+
+export interface Steps{
+  
+    distance: number;
+    duration: number;
+    geometry: Geometry;
+    maneuver: Maneuver
+  
 }
 
 export interface DirectionsApiResponse {
@@ -70,12 +79,7 @@ export interface DirectionsApiResponse {
       }[];
       distance: number;
       duration: number;
-      steps: {
-        distance: number;
-        duration: number;
-        geometry: Geometry;
-        maneuver: Maneuver
-      }[];
+      steps: Steps[];
       summary: string;
       weight: number;
     }[];
