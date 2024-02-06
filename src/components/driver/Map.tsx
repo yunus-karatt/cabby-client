@@ -1,8 +1,8 @@
 import mapboxgl from "mapbox-gl";
 import { useEffect, useRef } from "react";
-import ReactMapGL, { MapRef, NavigationControl } from "react-map-gl";
+import ReactMapGL, { MapRef, Marker, NavigationControl } from "react-map-gl";
 import MapboxRoute from "../user/MapboxRoute";
-import Markers from "../user/Markers";
+// import Markers from "../user/Markers";
 import { DirectionsApiResponse } from "../../interface/common/common";
 // import MapboxDirections from "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions";
 
@@ -26,7 +26,8 @@ const Map = ({
         source.latitude
       ],
       animate:true,
-      duration:1500
+      duration:1500,
+      zoom:15
     })
 
   },[source])
@@ -40,14 +41,15 @@ const Map = ({
             initialViewState={{
               latitude: source.latitude,
               longitude: source.longitude,
-              zoom: 18,
+              zoom: 15,
               
             }}
             mapStyle="mapbox://styles/mapbox/streets-v11"
             
           >
-            <Markers destinationProps={destination} sourceProps={source} 
-            />
+            {/* <Markers destinationProps={destination} sourceProps={source} /> */}
+            <Marker latitude={source.latitude} longitude={source.longitude} />
+            <Marker latitude={destination.latitude} longitude={destination.longitude} />
             {directionData?.routes && (
               <MapboxRoute
                 coordinates={directionData?.routes[0]?.geometry?.coordinates}

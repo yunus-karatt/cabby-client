@@ -3,159 +3,180 @@ import CurrentRideInfo from "../../components/driver/CurrentRideInfo";
 import DriverHeader from "../../components/driver/DriverHeader";
 import Map from "../../components/driver/Map";
 import { RideData } from "../../interface/driver/driverInterface";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { DirectionsApiResponse, Maneuver } from "../../interface/common/common";
-import { useSelector } from "react-redux";
-import { rootState } from "../../interface/user/userInterface";
+import {
+  DirectionsApiResponse,
+  Geometry,
+  Maneuver,
+  Steps,
+} from "../../interface/common/common";
+import { getDistance } from "../../utils/utils";
+
+interface Position {
+  coords: {
+    latitude: number;
+    longitude: number;
+  };
+}
 
 const CurrentRide = () => {
   const location = useLocation();
   const rideData: RideData = location.state;
 
-  // const {socketIO}=useSelector((state:rootState)=>state.driverSocket.socketIO)
-
+  const [pickup, setPickup] = useState<boolean>(true);
+  const [directionData, setDirectionData] = useState<DirectionsApiResponse>();
+  const [mapLoading, setMapLoading] = useState<boolean>(true);
   const [driverCoords, setDriverCoords] = useState<{
     latitude: number;
     longitude: number;
-  }>({
-    latitude: 0,
-    longitude: 0,
-  });
-  const [directionData, setDirectionData] = useState<DirectionsApiResponse>();
+  }>();
+  const [driverCoordsUpdates, setDriverCoordsUpdated] =
+    useState<boolean>(false);
+  const driverDummyLocation = useRef<number[][]>();
+  const intervalRef = useRef<NodeJS.Timeout>();
+  const [directionDataInitialised, setDirectionDataInitailised] =
+    useState<boolean>(false);
+  const [maneuver, setManeuver] = useState<Maneuver[]>();
+  const [currentManeuver, setCurrentManeuver] = useState<Maneuver | null>(null);
 
-  const [mapLoading, setMapLoading] = useState(true);
-  const [pickup, setPickup] = useState<boolean>(true);
-  const [maneuvers, setManeuvers] = useState<Maneuver[]>();
+  // manipulate driver coordinates
+  const manipulateDriverCoors = () => {
+    if (driverDummyLocation.current) {
+      if (driverDummyLocation?.current?.length <= 0) {
+        if (intervalRef) clearInterval(intervalRef.current);
+        return;
+      }
+      const location = driverDummyLocation.current.shift();
+      if (location) {
+        const position: Position = {
+          coords: {
+            longitude: location[0],
+            latitude: location[1],
+          },
+        };
+        updateDriverLocation(position);
+      }
+    }
+  };
 
-  // get current coords
-  const getCurrentCoords = () => {
+  // update drivercoord by navigator watch callback
+  const updateDriverLocation = (pos: Position) => {
+    setDriverCoords(() => ({
+      latitude: pos.coords.latitude,
+      longitude: pos.coords.longitude,
+    }));
+  };
+
+  const findCurrentManeuver = () => {
+    if (maneuver) {
+      const tempMan = [...maneuver];
+
+      if (driverCoords) {
+        if (
+          currentManeuver?.location[0] === driverCoords.longitude &&
+          currentManeuver.location[1] === driverCoords.latitude
+        ) {
+          setCurrentManeuver(null)
+        }
+        const distance = getDistance(
+          driverCoords?.latitude,
+          driverCoords?.longitude,
+          maneuver[0]?.location[1],
+          maneuver[0]?.location[0]
+        );
+        console.log({ distance });
+        if (distance < 0.1) {
+          const shiftedMan = tempMan.shift();
+          setManeuver(() => tempMan);
+          if (shiftedMan) setCurrentManeuver(shiftedMan);
+        }
+      }
+    }
+  };
+
+  const isDriverWithinManeuver = (maneuver: {
+    latitude: number;
+    longitude: number;
+  }): boolean => {
+    // const threshold = 0.0001;
+    if (driverCoords)
+      return (
+        Math.abs(driverCoords?.latitude - maneuver.latitude) === 0 &&
+        Math.abs(driverCoords?.longitude - maneuver.longitude) === 0
+      );
+    else return false;
+  };
+
+  // GET CURRENT COORDS
+  useEffect(() => {
     navigator.geolocation.getCurrentPosition((pos) => {
+      console.log({ pos });
       setDriverCoords(() => ({
         latitude: pos.coords.latitude,
         longitude: pos.coords.longitude,
       }));
-      setMapLoading(false);
+      setDriverCoordsUpdated(() => true);
+      setMapLoading(() => false);
     });
-  };
 
-  const getDirectionRoute = async () => {
-    try {
-      if (directionData) {
-        console.log("returned from getDirectonRoute");
-        return;
-      }
-      const { data }: { data: DirectionsApiResponse } = await axios.get(
-        `https://api.mapbox.com/directions/v5/mapbox/driving/${
-          driverCoords.longitude
-        },${driverCoords.latitude};${rideData.sourceCoordinates.longitude},${
-          rideData.sourceCoordinates.latitude
-        }?overview=full&geometries=geojson&steps=true&access_token=${
-          import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
-        }`
-      );
-      console.log({ data });
-      setDirectionData(() => data);
-      setManeuvers(() =>
-        data.routes[0].legs[0].steps.map((step) => step.maneuver)
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    // const watchId = navigator.geolocation.watchPosition(updateDriverLocation);
 
-  interface Position {
-    coords: {
-      latitude: number;
-      longitude: number;
-    };
-  }
-
-  // For test purpose
-  const updateTestDriverLocation = () => {
-    if (!maneuvers?.length) {
-      console.log("maneuvers finished");
-      clearInterval(interval);
-    }
-    const maneuver = maneuvers?.shift();
-    if (maneuver && directionData) {
-      const [longitude, latitude] = maneuver.location;
-      const index = directionData?.routes[0].geometry.coordinates.findIndex(
-        ([coordlongitude, coordlatitude]) =>
-          coordlongitude === longitude && coordlatitude == latitude
-      );
-      const newCoordinate = [...directionData?.routes[0].geometry.coordinates];
-      newCoordinate.splice(0, index );
-      // console.log('coordinated',directionData?.routes[0].geometry.coordinates)
-
-      setDirectionData((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          routes: [
-            {
-              ...prev?.routes[0],
-              geometry: {
-                ...prev?.routes[0].geometry,
-                coordinates: newCoordinate,
-              },
-            },
-          ],
-        };
-      });
-      setDriverCoords(() => ({ latitude, longitude }));
-    }
-  };
-  const interval = setInterval(updateTestDriverLocation, 10000);
-
-  // production
-  const updateDriverLocation = (position: Position) => {
-    setDriverCoords(() => position.coords);
-    findCurrentManeuver();
-  };
-
-  const findCurrentManeuver = (): Maneuver | null => {
-    if (maneuvers)
-      for (let maneuver of maneuvers) {
-        if (
-          isDriverWithinManeuver({
-            latitude: maneuver.location[1],
-            longitude: maneuver.location[0],
-          })
-        )
-          return maneuver;
-      }
-    return null;
-  };
-
-  const isDriverWithinManeuver = (maneuvarLocationa: {
-    latitude: number;
-    longitude: number;
-  }): boolean => {
-    const threshold: number = 0.0001;
-
-    return (
-      Math.abs(driverCoords.latitude - maneuvarLocationa.latitude) >
-        threshold &&
-      Math.abs(driverCoords.longitude - maneuvarLocationa.longitude) > threshold
-    );
-  };
-
-  // driver initial coordinates
-  useEffect(() => {
-    getCurrentCoords();
+    // return () => {
+    //   navigator.geolocation.clearWatch(watchId);
+    // };
   }, []);
 
-  // get directional route
   useEffect(() => {
-    if (driverCoords.latitude && rideData.sourceCoordinates.latitude) {
-      getDirectionRoute();
-    }
+    findCurrentManeuver();
   }, [driverCoords]);
 
+  // GET DIRECTIONDATA
   useEffect(() => {
-    const watchId = navigator.geolocation.watchPosition(updateDriverLocation);
-  }, []);
+    const getDirections = async () => {
+      try {
+        if (driverCoords) {
+          console.log({ driverCoords });
+          const { data }: { data: DirectionsApiResponse } = await axios.get(
+            `https://api.mapbox.com/directions/v5/mapbox/driving/${
+              driverCoords.longitude
+            },${driverCoords.latitude};${
+              rideData.sourceCoordinates.longitude
+            },${
+              rideData.sourceCoordinates.latitude
+            }?overview=full&geometries=geojson&steps=true&access_token=${
+              import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
+            }`
+          );
+
+          setDirectionData(() => ({ ...data }));
+          driverDummyLocation.current = data.routes[0].geometry.coordinates;
+          setDirectionDataInitailised(true);
+          setCurrentManeuver(() => data.routes[0].legs[0].steps[0].maneuver);
+          const manevuerData = data.routes[0].legs[0].steps.map(
+            (man) => man.maneuver
+          );
+          manevuerData?.shift();
+          setManeuver(() => manevuerData);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getDirections();
+  }, [driverCoordsUpdates]);
+
+  useEffect(() => {
+    if (driverDummyLocation.current) {
+      if (driverDummyLocation?.current?.length > 0) {
+        intervalRef.current = setInterval(manipulateDriverCoors, 500);
+
+        return () => clearInterval(intervalRef.current);
+      }
+    } else {
+      console.log("useEffect else condition");
+    }
+  }, [directionDataInitialised]);
 
   return (
     <>
@@ -171,7 +192,7 @@ const CurrentRide = () => {
             }
           />
         </div>
-        {!mapLoading && (
+        {!mapLoading && driverCoords && (
           <div className="relative md:w-3/4 w-full h-full">
             <Map
               destination={rideData.sourceCoordinates}
@@ -180,7 +201,7 @@ const CurrentRide = () => {
             />
             <div className="absolute top-2 rounded-md left-[50%] -translate-x-[50%] bg-white z-40 p-5">
               <p className="font-bold text-xl">
-                {maneuvers? maneuvers[0]?.instruction:null}
+                {currentManeuver?.instruction}
               </p>
             </div>
           </div>
