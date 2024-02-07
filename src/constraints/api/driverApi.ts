@@ -9,5 +9,6 @@ export default{
   changeAvailability:'/set-availability',
   postRejectionReason:'/rejection-reason',
   goOffline:'/go-offline',
-  getUserData:'/get-user'
+  getUserData:'/get-user',
+  verifyOTP:'/verify-ride-otp'
 }

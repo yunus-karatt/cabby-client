@@ -1,7 +1,7 @@
 import { Circle } from "lucide-react";
 import avatar from "../../assets/avatar 1.png";
 import { RideData } from "../../interface/driver/driverInterface";
-import { useEffect, useState } from "react";
+import {  useEffect, useRef, useState } from "react";
 import { driverAxios } from "../../constraints/axios/driverAxios";
 import driverApi from "../../constraints/api/driverApi";
 import ConfirmPopup from "../common/ConfirmPopup";
@@ -14,31 +14,68 @@ const CurrentRideInfo = ({
   rideData,
   distance,
   pickup,
+  isAtPickupPoint,
+  setOtpVerified,
+  otpVerified
 }: {
   rideData: RideData;
   distance?: string;
   pickup: boolean;
+  isAtPickupPoint: boolean;
+  setOtpVerified: React.Dispatch<React.SetStateAction<boolean>>
+  otpVerified:boolean
 }) => {
   const [user, setUser] = useState<{
     firstName: string;
     lastName: string;
   } | null>(null);
-
   const [isconfirmPopup, setIsConfirmPopup] = useState<boolean>(false);
   const [inputPop, setInputPop] = useState<boolean>(false);
   const [cancelReason, setCancelReason] = useState<string>("");
   const { socketIO } = useSelector((state: rootState) => state.driverSocket);
-  
+  const otpRef = useRef<HTMLInputElement>(null);
+  const [otpInput, setOtpInput] = useState<number>();
+  const [otpError, setOtpError] = useState({ isError: false, message: "" });
+
   const handleCancelRide = async () => {
     setIsConfirmPopup(() => true);
   };
 
+
   const handleCancelSubmission = async () => {
     console.log("function called");
     console.log({ socketIO }, "here");
-    socketIO?.emit('cancelRideBydriver',{hell:'hai'})
-    // if (socketIO) emitEvent(socketIO, "cancelRideBydriver", { hell: "hai" });
+    socketIO?.emit("cancelRideBydriver", { hell: "hai" });
   };
+
+  const verifyOTP = async() => {
+    const stringOTP = otpInput?.toString();
+    if (stringOTP?.length != 6) {
+      setOtpError(() => ({
+        isError: true,
+        message: "OTP must be Six Numbers",
+      }));
+      return;
+    }
+    if (!otpInput) {
+      setOtpError(() => ({ isError: true, message: "Please Enter OTP" }));
+      return;
+    }
+    try{
+      const res=await driverAxios.post(driverApi.verifyOTP,{rideId:rideData._id,OTP:otpInput})
+      if(res.data){
+        setOtpVerified(true)
+      }else{
+        setOtpError(()=>({isError:true,message:"OTP doesn't match"}))
+      }
+    }catch(error){
+      console.error(error)
+    }
+  };
+
+  useEffect(() => {
+    isAtPickupPoint && otpRef.current?.focus();
+  }, [isAtPickupPoint]);
 
   //  Get user data
   useEffect(() => {
@@ -46,7 +83,6 @@ const CurrentRideInfo = ({
       const res = await driverAxios.get(
         `${driverApi.getUserData}/${rideData.userId}`
       );
-      // console.log(res.data)
       setUser(() => res.data);
     };
     fetchData();
@@ -56,7 +92,18 @@ const CurrentRideInfo = ({
     <>
       <div className="p-5 px-8 flex md:flex-col items-center flex-row gap-8">
         <div className="flex flex-col gap-y-3">
-          <h1 className="font-bold md:text-3xl">{distance} km away</h1>
+          <h1 className="font-bold md:text-3xl">
+            {otpVerified ? (<>
+            
+              Ride in Progress..
+              <br />
+              {distance}KM
+            </>):
+            (!isAtPickupPoint
+              ? distance + " " + "km away"
+              : "Waiting for the Rider"
+            )}
+          </h1>
           <p className="text-text-secondary opacity-80">
             Pickup {user?.firstName} {user?.lastName}
           </p>
@@ -91,6 +138,32 @@ const CurrentRideInfo = ({
               <p>{rideData.destinationLocation}</p>
             </div>
           </div>
+          {isAtPickupPoint && !otpVerified &&(
+            <div className="flex flex-col gap-y-3">
+              <p className="font-bold text-lg">OTP</p>
+              <input
+                onChange={(e) => {
+                  setOtpInput(e.target.valueAsNumber)
+                  setOtpError(()=>({isError:false,message:''}))
+                }}
+                ref={otpRef}
+                value={otpInput}
+                type="number"
+                name="otpInput"
+                id="otpInput"
+                className="border-2 w-full p-2 rounded"
+              />
+              {otpError.isError && 
+              <p className="text-danger font-semibold font-md">{otpError.message} </p>
+              }
+              <button
+                onClick={verifyOTP}
+                className="bg-primary mt-3 rounded-md w-full p-1 text-white"
+              >
+                Start Ride
+              </button>
+            </div>
+          )}
           <div className="text-center mt-5">
             <button
               onClick={handleCancelRide}

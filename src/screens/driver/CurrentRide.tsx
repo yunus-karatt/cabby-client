@@ -39,12 +39,18 @@ const CurrentRide = () => {
     useState<boolean>(false);
   const [maneuver, setManeuver] = useState<Maneuver[]>();
   const [currentManeuver, setCurrentManeuver] = useState<Maneuver | null>(null);
+  const [currentStep, setCurrentStep] = useState<Steps[]>();
+  const [isAtPickupPoint, setIsAtPickupPoint] = useState<boolean>(false);
+  const [otpVerified, setOtpVerified] = useState<boolean>(false);
 
   // manipulate driver coordinates
   const manipulateDriverCoors = () => {
     if (driverDummyLocation.current) {
       if (driverDummyLocation?.current?.length <= 0) {
-        if (intervalRef) clearInterval(intervalRef.current);
+        if (intervalRef) {
+          console.log("interval cleared");
+          clearInterval(intervalRef.current);
+        }
         return;
       }
       const location = driverDummyLocation.current.shift();
@@ -67,7 +73,7 @@ const CurrentRide = () => {
       longitude: pos.coords.longitude,
     }));
   };
-
+  // finding current step to direction
   const findCurrentManeuver = () => {
     if (maneuver) {
       const tempMan = [...maneuver];
@@ -77,7 +83,16 @@ const CurrentRide = () => {
           currentManeuver?.location[0] === driverCoords.longitude &&
           currentManeuver.location[1] === driverCoords.latitude
         ) {
-          setCurrentManeuver(null)
+          const steps = directionData?.routes[0].legs[0].steps.filter(
+            (step) => {
+              return (
+                step.maneuver.location[0] === driverCoords.longitude &&
+                step.maneuver.location[1] === driverCoords.latitude
+              );
+            }
+          );
+          if (steps) setCurrentStep(steps);
+          setCurrentManeuver(null);
         }
         const distance = getDistance(
           driverCoords?.latitude,
@@ -85,7 +100,6 @@ const CurrentRide = () => {
           maneuver[0]?.location[1],
           maneuver[0]?.location[0]
         );
-        console.log({ distance });
         if (distance < 0.1) {
           const shiftedMan = tempMan.shift();
           setManeuver(() => tempMan);
@@ -111,7 +125,6 @@ const CurrentRide = () => {
   // GET CURRENT COORDS
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((pos) => {
-      console.log({ pos });
       setDriverCoords(() => ({
         latitude: pos.coords.latitude,
         longitude: pos.coords.longitude,
@@ -119,7 +132,6 @@ const CurrentRide = () => {
       setDriverCoordsUpdated(() => true);
       setMapLoading(() => false);
     });
-
     // const watchId = navigator.geolocation.watchPosition(updateDriverLocation);
 
     // return () => {
@@ -128,68 +140,97 @@ const CurrentRide = () => {
   }, []);
 
   useEffect(() => {
+    if (pickup && currentStep && currentStep[0].distance == 0) {
+      setIsAtPickupPoint(() => true);
+    }
+  }, [currentStep]);
+
+  useEffect(() => {
     findCurrentManeuver();
   }, [driverCoords]);
 
   // GET DIRECTIONDATA
-  useEffect(() => {
-    const getDirections = async () => {
-      try {
-        if (driverCoords) {
-          console.log({ driverCoords });
-          const { data }: { data: DirectionsApiResponse } = await axios.get(
-            `https://api.mapbox.com/directions/v5/mapbox/driving/${
-              driverCoords.longitude
-            },${driverCoords.latitude};${
-              rideData.sourceCoordinates.longitude
-            },${
-              rideData.sourceCoordinates.latitude
-            }?overview=full&geometries=geojson&steps=true&access_token=${
-              import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
-            }`
-          );
-
-          setDirectionData(() => ({ ...data }));
-          driverDummyLocation.current = data.routes[0].geometry.coordinates;
+  const getDirections = async (destLat: number, destLong: number) => {
+    try {
+      if (driverCoords) {
+        const { data }: { data: DirectionsApiResponse } = await axios.get(
+          `https://api.mapbox.com/directions/v5/mapbox/driving/${
+            driverCoords.longitude
+          },${
+            driverCoords.latitude
+          };${destLong},${destLat}?overview=full&geometries=geojson&steps=true&access_token=${
+            import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
+          }`
+        );
+        setDirectionData(() => ({ ...data }));
+        driverDummyLocation.current = data.routes[0].geometry.coordinates;
+        if (
+          destLat === rideData.sourceCoordinates.latitude &&
+          destLong === rideData.sourceCoordinates.longitude
+        ) {
           setDirectionDataInitailised(true);
-          setCurrentManeuver(() => data.routes[0].legs[0].steps[0].maneuver);
-          const manevuerData = data.routes[0].legs[0].steps.map(
-            (man) => man.maneuver
-          );
-          manevuerData?.shift();
-          setManeuver(() => manevuerData);
         }
-      } catch (error) {
-        console.log(error);
+        setCurrentManeuver(() => data.routes[0].legs[0].steps[0].maneuver);
+        const manevuerData = data.routes[0].legs[0].steps.map(
+          (man) => man.maneuver
+        );
+        manevuerData?.shift();
+        setManeuver(() => manevuerData);
       }
-    };
-    getDirections();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // directon from driver to user source
+  useEffect(() => {
+    getDirections(
+      rideData.sourceCoordinates.latitude,
+      rideData.sourceCoordinates.longitude
+    );
   }, [driverCoordsUpdates]);
 
+  // direction from user source to destination
   useEffect(() => {
+    if (isAtPickupPoint) {
+      clearInterval(intervalRef.current);
+      getDirections(
+        rideData.destinationCoordinates.latitude,
+        rideData.destinationCoordinates.longitude
+      );
+    }
+  }, [isAtPickupPoint]);
+
+  useEffect(() => {
+    if(otpVerified){
+      setPickup(false)
+    }
     if (driverDummyLocation.current) {
       if (driverDummyLocation?.current?.length > 0) {
-        intervalRef.current = setInterval(manipulateDriverCoors, 500);
+        intervalRef.current = setInterval(manipulateDriverCoors, 300);
 
         return () => clearInterval(intervalRef.current);
       }
     } else {
       console.log("useEffect else condition");
     }
-  }, [directionDataInitialised]);
+  }, [directionDataInitialised,otpVerified]);
 
   return (
     <>
       <DriverHeader />
       <div className="w-full h-[100vh] flex md:flex-row flex-col gap-3 p-2 bg-secondary">
-        <div className="md:w-1/4 w-full bg-white rounded-md">
+        <div className="md:w-1/4 w-full bg-white rounded-md overflow-y-scroll">
           <CurrentRideInfo
             pickup={pickup}
             rideData={rideData}
             distance={
-              directionData &&
-              (directionData?.routes[0]?.distance / 1000).toFixed(2)
+              currentStep && (currentStep[0].distance / 1000).toFixed(2)
             }
+            isAtPickupPoint={isAtPickupPoint}
+            // isAtPickupPoint
+            setOtpVerified={setOtpVerified}
+            otpVerified={otpVerified}
           />
         </div>
         {!mapLoading && driverCoords && (
@@ -199,11 +240,13 @@ const CurrentRide = () => {
               source={driverCoords}
               directionData={directionData}
             />
-            <div className="absolute top-2 rounded-md left-[50%] -translate-x-[50%] bg-white z-40 p-5">
-              <p className="font-bold text-xl">
-                {currentManeuver?.instruction}
-              </p>
-            </div>
+            {currentManeuver && (
+              <div className="absolute top-2 rounded-md left-[50%] -translate-x-[50%] bg-white z-40 p-5">
+                <p className="font-bold text-xl">
+                  {currentManeuver?.instruction}
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
