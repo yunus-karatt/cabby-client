@@ -9,15 +9,12 @@ import {
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { rootState } from "../../interface/user/userInterface";
-// import { LocationSuggestion } from "../../interface/user/userInterface";
 
 export const SelectDestination = ({
-  // setShowCabs,
   socketIO,
   distance,
   duration
 }: {
-  // setShowCabs: React.Dispatch<React.SetStateAction<boolean>>;
   socketIO: Socket|null;
   distance: number;
   duration: string;
@@ -28,30 +25,29 @@ export const SelectDestination = ({
 
   const [sourceL, setSource] = useState<{
     placeName: string;
-    lat: number;
-    long: number;
+    latitude: number;
+    longitude: number;
   }>({
     placeName: "",
-    lat: 0,
-    long: 0,
+    latitude: 0,
+    longitude: 0,
   });
 
   const [sourceChange, setSourceChange] = useState(false);
   const [destinationChange, setDestinationChange] = useState(false);
   const [destinationL, setDestination] = useState<{
     placeName: string;
-    lat: number;
-    long: number;
+    latitude: number;
+    longitude: number;
   }>({
     placeName: "",
-    lat: 0,
-    long: 0,
+    latitude: 0,
+    longitude: 0,
   });
 
   const [addressList, setAddressList] = useState<
     { placeName: string; lat: number; long: number }[]
   >([]);
-  // const [amount, setAmount] = useState<number | null>(null);
 
 
   const getAddressList = async () => {
@@ -91,49 +87,42 @@ export const SelectDestination = ({
 
   const onSourceAddressClick = (
     placeName: string,
-    lat: number,
-    long: number
+    latitude: number,
+    longitude: number
   ) => {
     setAddressList([]);
-    setSource(() => ({ placeName, lat, long }));
-    dispatch(setSourceCoordinates({ lat, long, placeName }));
+    setSource(() => ({ placeName, latitude, longitude }));
+    dispatch(setSourceCoordinates({ latitude, longitude, placeName }));
     setSourceChange(false);
   };
   const onDestinationAddressClick = (
     placeName: string,
-    lat: number,
-    long: number
+    latitude: number,
+    longitude: number
   ) => {
     setAddressList([]);
-    setDestination({ placeName, lat, long });
-    dispatch(setDestinationCoordinates({ lat, long, placeName }));
+    setDestination({ placeName, latitude, longitude });
+    dispatch(setDestinationCoordinates({ latitude, longitude, placeName }));
     setDestinationChange(false);
   };
 
   const handleSearch = () => {
-    if (!sourceL.lat || !destinationL.lat) {
+    if (!sourceL.latitude || !destinationL.latitude) {
       toast.error("Please select Locations");
       return;
     }
-    if (sourceL.lat == destinationL.lat && sourceL.long == destinationL.long) {
+    if (sourceL.latitude == destinationL.latitude && sourceL.longitude == destinationL.longitude) {
       toast.error("Please check you selected locations");
       return;
     }
     socketIO?.emit("getNearByDrivers", {
       source:sourceL,
       destination:destinationL,
-      // selectedCabId,
       duration,
       distance,
-      // amount,
       userId,
     });
-    // setShowCabs(true);
-    // console.log({source,destination})
-    // socket?.emit("searchCabs",({
-    //   source,
-    //   destination
-    // }))
+    
   };
 
   useEffect(() => {

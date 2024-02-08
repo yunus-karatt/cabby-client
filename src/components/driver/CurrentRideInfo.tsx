@@ -65,6 +65,7 @@ const CurrentRideInfo = ({
       const res=await driverAxios.post(driverApi.verifyOTP,{rideId:rideData._id,OTP:otpInput})
       if(res.data){
         setOtpVerified(true)
+        socketIO?.emit('otpVerified',{userId:rideData.userId,rideId:rideData._id})
       }else{
         setOtpError(()=>({isError:true,message:"OTP doesn't match"}))
       }

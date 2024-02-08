@@ -12,6 +12,8 @@ import {
   Steps,
 } from "../../interface/common/common";
 import { getDistance } from "../../utils/utils";
+import { useSelector } from "react-redux";
+import { rootState } from "../../interface/user/userInterface";
 
 interface Position {
   coords: {
@@ -23,6 +25,8 @@ interface Position {
 const CurrentRide = () => {
   const location = useLocation();
   const rideData: RideData = location.state;
+
+  const {socketIO}=useSelector((state:rootState)=>state.driverSocket)
 
   const [pickup, setPickup] = useState<boolean>(true);
   const [directionData, setDirectionData] = useState<DirectionsApiResponse>();
@@ -48,7 +52,6 @@ const CurrentRide = () => {
     if (driverDummyLocation.current) {
       if (driverDummyLocation?.current?.length <= 0) {
         if (intervalRef) {
-          console.log("interval cleared");
           clearInterval(intervalRef.current);
         }
         return;
@@ -72,6 +75,7 @@ const CurrentRide = () => {
       latitude: pos.coords.latitude,
       longitude: pos.coords.longitude,
     }));
+    socketIO?.emit('driverLiveLocation',{pos,rideId:rideData._id,userId:rideData.userId})
   };
   // finding current step to direction
   const findCurrentManeuver = () => {
