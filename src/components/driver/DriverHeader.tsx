@@ -126,6 +126,7 @@ const DriverHeader = () => {
 
   if (socketIO) {
     socketIO.on("getDriverCoordinates", async (data) => {
+      console.log('getDriverCoordinates',{data});
       const res: { latitude: number; longitude: number } =
         await getLiveCoordinates();
       let coordinates: { lat: number; lng: number } = {
@@ -134,8 +135,10 @@ const DriverHeader = () => {
       };
       // setLocation(coordinates);
       const source = { lat: coordinates.lat, long: coordinates.lng };
-      const destination = { lat: data.lat, long: data.long };
+      const destination = { lat: data.latitude, long: data.longitude };
       const distance = await getDistance(source, destination);
+      console.log({distance})
+
       if (distance <= 5) {
         socketIO.emit("driverDistance", {
           distance,
@@ -146,6 +149,7 @@ const DriverHeader = () => {
         });
       }
     });
+
     socketIO.on(
       "getDriverConfirmation",
       (data: { driverId: string; rideData: RideData }) => {

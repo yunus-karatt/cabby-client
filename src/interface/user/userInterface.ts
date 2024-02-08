@@ -49,13 +49,13 @@ export interface UserData {
 
 export interface RouteCoordinates {
   source: {
-    lat: number;
-    long: number;
+    latitude: number;
+    longitude: number;
     placeName: string;
   };
   destination: {
-    lat: number;
-    long: number;
+    latitude: number;
+    longitude: number;
     placeName: string;
   };
 }
