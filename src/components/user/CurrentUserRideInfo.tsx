@@ -6,10 +6,14 @@ import { useEffect, useState } from "react";
 const CurrentUserRideInfo = ({
   rideData,
   rideStatus,
+  distance
 }: {
-  rideStatus: "started" | "ended" | null;
+  rideStatus: "started" | "ended" | 'initiated';
   rideData?: CurrentRideData;
+  distance?: string;
+
 }) => {
+  useEffect(()=>console.log({rideData}),[])
   const otpString = rideData?.otp.toString();
   const otpArray = otpString?.split("");
 
@@ -19,11 +23,19 @@ const CurrentUserRideInfo = ({
     if (rideStatus === "started") {
       setShowOTP(() => false);
     }
+  
   }, [rideStatus]);
 
   return (
     <div className=" bg-white h-[100%] overflow-y-scroll overflow-x-hidden rounded-lg flex flex-col p-5 gap-y-3">
       <div className={`p-2`}>
+        <div className="flex flex-col gap-y-3 my-3">
+          <p className="font-bold text-2xl">{rideStatus==='initiated' && 'Your Driver is'}
+          {rideStatus==='started' &&'Ride In Progress'}
+          {rideStatus==='ended' && 'You are reached you destination'}
+          </p>
+        <p className="font-bold text-xl">{distance} Km away</p>
+        </div>
         <p className="font-semibold text-xl">Driver</p>
         <div className="border-2 border-black p-3 mt-5 flex justify-between items-center">
           <img
@@ -48,6 +60,8 @@ const CurrentUserRideInfo = ({
             {rideData?.driverData.cabModel[0].cabType}
           </p>
           <p className="text-xl font-bold">₹{rideData?.price}</p>
+        </div>
+        <div>
         </div>
         <div className="hidden md:block">
           <div className="mt-5">

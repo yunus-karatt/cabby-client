@@ -34,7 +34,7 @@ const CurrentRideInfo = ({
   const [cancelReason, setCancelReason] = useState<string>("");
   const { socketIO } = useSelector((state: rootState) => state.driverSocket);
   const otpRef = useRef<HTMLInputElement>(null);
-  const [otpInput, setOtpInput] = useState<number>();
+  const [otpInput, setOtpInput] = useState<number|null>(null);
   const [otpError, setOtpError] = useState({ isError: false, message: "" });
 
   const handleCancelRide = async () => {
@@ -148,7 +148,7 @@ const CurrentRideInfo = ({
                   setOtpError(()=>({isError:false,message:''}))
                 }}
                 ref={otpRef}
-                value={otpInput}
+                value={otpInput?otpInput:''}
                 type="number"
                 name="otpInput"
                 id="otpInput"

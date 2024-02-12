@@ -16,7 +16,7 @@ import driverApi from "../../constraints/api/driverApi";
 import { Driver } from "../../interface/driver/driverInterface";
 
 const Auth: React.FC = () => {
-  const [driver,setDriver]=useState<Driver | null>(null);
+  const [driver,setDriver]=useState<Driver >();
   const [number, setNumber] = useState("+919995868047");
   const [user, setUser] = useState<ConfirmationResult | null>(null);
 

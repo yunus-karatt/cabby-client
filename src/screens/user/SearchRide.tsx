@@ -1,29 +1,24 @@
 import Navbar from "../../components/user/Navbar";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { useEffect, useRef, useState } from "react";
-import ReactMapGL, {
-  GeolocateControl,
-  Marker,
-  NavigationControl,
-} from "react-map-gl";
+import { useEffect, useState } from "react";
+
 import { SelectDestination } from "../../components/user/SelectDestination";
-import Markers from "../../components/user/Markers";
-import { useSelector } from "react-redux";
-import { CurrentRideData, rootState } from "../../interface/user/userInterface";
+import { useDispatch, useSelector } from "react-redux";
+import { rootState } from "../../interface/user/userInterface";
 import axios from "axios";
-import MapboxRoute from "../../components/user/MapboxRoute";
 import { Socket, io } from "socket.io-client";
 import ListCabs from "../../components/user/ListCabs";
 import LoaderFetchDriver from "../../components/user/LoaderFetchDriver";
 import { toast } from "react-toastify";
-import CurrentUserRideInfo from "../../components/user/CurrentUserRideInfo";
 import UserMap from "../../components/user/UserMap";
+import { DirectionsApiResponse } from "../../interface/common/common";
+import { setUserSocket } from "../../services/redux/slices/userSocketSlice";
+import { setUserCurrentRideData } from "../../services/redux/slices/userCurrentRideSlice";
+import { useNavigate } from "react-router";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const SearchRide = () => {
-  const { userInfo } = useSelector((state: rootState) => state.userAuth);
-
   const [currentLocation, setCurrentLocation] = useState({
     longitude: 0,
     latitude: 0,
@@ -38,16 +33,13 @@ const SearchRide = () => {
   const [availableCabs, setAvailableCabs] = useState<string[]>([]);
   const [rideId, setRideId] = useState<string>("");
   const [loaderFetchDriver, setLoaderFetchDriver] = useState(false);
-  const [showInput, setShowInput] = useState(true);
-  const [currentRideData, setCurrentRideData] =
-    useState<CurrentRideData | null>(null);
-  const [driverCoors, setDriverCoors] = useState<{
-    latitude: number;
-    longitude: number;
-  }>();
-  const [rideStatus, setRideStatus] = useState<"started" | "ended" | null>(
-    null
-  );
+  const [isSearchingForAvailableCabs, setIsSearchingForAvailableCabs] =
+    useState<boolean>(false);
+  const [isScheduled, setisScheduled] = useState<boolean>(false);
+  const [selectedDateTime, setSelectedDateTime] = useState<string>('');
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const getUserLocation = () => {
     navigator.geolocation.getCurrentPosition((pos) => {
@@ -65,7 +57,7 @@ const SearchRide = () => {
     const socket = io(import.meta.env.VITE_SOCKET_SERVER, {
       transports: ["websocket"],
     });
-
+    dispatch(setUserSocket(socket));
     setSocketIO(socket);
     if (socket) {
       socket.on("connect", () => {
@@ -73,6 +65,7 @@ const SearchRide = () => {
         socket.on(
           "sendAvailableCabs",
           (data: { cabId: string[]; rideId: string }) => {
+            setIsSearchingForAvailableCabs(false);
             setShowCabs(true);
             setRideId(data.rideId);
             setAvailableCabs(() => data.cabId);
@@ -86,37 +79,14 @@ const SearchRide = () => {
         socket.on("approvedRide", (rideData: any) => {
           setLoaderFetchDriver(() => false);
           setShowCabs(() => false);
-          setCurrentRideData(() => rideData[0]);
-
-          setShowInput(() => false);
-        });
-
-        socket.on(
-          "updateDriverCoordsForDriver",
-          (data: {
-            pos: { coords: { longitude: number; latitude: number } };
-            rideId: string;
-            userId: string;
-          }) => {
-            setDriverCoors(() => data.pos.coords);
-          }
-        );
-
-        socket.on("rideStarted", (data: { rideId: string; userId: string }) => {
-          if (data.userId === userInfo._id) {
-            setRideStatus(() => "started");
-          }
+          // setCurrentRideData(() => rideData[0]);
+          dispatch(setUserCurrentRideData(rideData[0]));
+          navigate("/current-ride");
         });
       });
     } else {
       console.log("cannot connect");
     }
-
-    return () => {
-      socket.disconnect();
-      socketIO?.disconnect();
-      setSocketIO(null);
-    };
   }, []);
 
   const getDirection = async (
@@ -125,24 +95,12 @@ const SearchRide = () => {
     desLat: number,
     desLong: number
   ) => {
-    const res =
-      await axios.get(`https://api.mapbox.com/directions/v5/mapbox/driving/${sourceLong},${sourceLat};${desLong},${desLat}?overview=full&geometries=geojson
+    const res: { data: DirectionsApiResponse } =
+      await axios.get(`https://api.mapbox.com/directions/v5/mapbox/driving/${sourceLong},${sourceLat};${desLong},${desLat}?overview=full&geometries=geojson&steps=true
 &access_token=${import.meta.env.VITE_MAPBOX_ACCESS_TOKEN}`);
     console.log({ res }, "from directionData");
     setDirectionData(() => res.data);
   };
-
-  // getting direction from driver coors to user source
-  useEffect(() => {
-    currentRideData &&
-      getDirection(
-        currentRideData?.driverCoordinates.latitude,
-        currentRideData?.driverCoordinates.longitude,
-        currentRideData?.sourceCoordinates.latitude,
-        currentRideData?.sourceCoordinates.longitude
-      );
-    setDriverCoors(() => currentRideData?.driverCoordinates);
-  }, [currentRideData]);
 
   // getting direction from source to destination on search
   useEffect(() => {
@@ -166,17 +124,6 @@ const SearchRide = () => {
     getUserLocation();
   }, []);
 
-  useEffect(() => {
-    if (rideStatus === "started") {
-      if(driverCoors)
-      getDirection(
-        driverCoors?.latitude,
-        driverCoors?.longitude,
-        destination.latitude,
-        destination.longitude
-      );
-    }
-  }, [rideStatus]);
   return (
     <>
       <div
@@ -185,23 +132,22 @@ const SearchRide = () => {
         <Navbar />
         <div className=" bg-secondary w-[100%] h-[100%] flex flex-col md:flex-row gap-x-3 p-6 gap-y-6">
           <div className="md:flex-shrink-0 md:w-1/4">
-            {showInput ? (
-              <SelectDestination
-                socketIO={socketIO}
-                // setShowCabs={setShowCabs}
-                duration={(directionData?.routes[0].duration / 60).toFixed(2)}
-                distance={parseFloat(
-                  (directionData?.routes[0].distance / 1000).toFixed(2)
-                )}
-              />
-            ) : (
-              <CurrentUserRideInfo
-                rideStatus={rideStatus}
-                rideData={currentRideData ? currentRideData : undefined}
-              />
-            )}
+            <SelectDestination
+              searching={isSearchingForAvailableCabs}
+              setSearching={setIsSearchingForAvailableCabs}
+              socketIO={socketIO}
+              duration={(directionData?.routes[0].duration / 60).toFixed(2)}
+              distance={parseFloat(
+                (directionData?.routes[0].distance / 1000).toFixed(2)
+              )}
+              isScheduled={isScheduled}
+              setisScheduled={setisScheduled}
+              setShowCabs={setShowCabs}
+              selectedDateTime={selectedDateTime}
+              setSelectedDateTime={setSelectedDateTime}
+            />
           </div>
-          {showCabs && availableCabs.length > 0 && (
+          {showCabs && (
             <div className="md:flex-shrink-0 md:w-1/3">
               <ListCabs
                 rideId={rideId}
@@ -212,76 +158,20 @@ const SearchRide = () => {
                 )}
                 availableCabs={availableCabs}
                 setLoaderFetchDriver={setLoaderFetchDriver}
+                scheduledRide={isScheduled}
+                selectedDateTime={selectedDateTime}
               />
             </div>
           )}
           {mapLoaded && (
             <div className="w-full md:h-full h-[300px] bg-white rounded-lg relative">
-              {/* <ReactMapGL
-                ref={mapRef}
-                mapboxAccessToken={import.meta.env.VITE_MAPBOX_ACCESS_TOKEN}
-                initialViewState={{
-                  longitude: location.lng,
-                  latitude: location.lat,
-                  zoom: 15,
-                }}
-                mapStyle="mapbox://styles/mapbox/streets-v11"
-              >
-                {!destination.lat &&
-                  !destination.long &&
-                  !source.lat &&
-                  !source.long && (
-                    <Marker
-                      ref={markRef}
-                      latitude={location.lat}
-                      longitude={location.lng}
-                      draggable
-                      onDragEnd={(e) =>
-                        setCurrentLocation(() => ({
-                          lat: e.lngLat.lat,
-                          lng: e.lngLat.lng,
-                        }))
-                      }
-                    />
-                  )}
-
-                {showInput ? (
-                  <Markers />
-                ) : (
-                  <Markers
-                    destinationProps={currentRideData?.sourceCoordinates}
-                    sourceProps={driverCoors}
-                  />
-                )}
-
-                {directionData?.routes && (
-                  <MapboxRoute
-                    coordinates={
-                      directionData?.routes[0]?.geometry?.coordinates
-                    }
-                  />
-                )}
-                <NavigationControl position="bottom-right" />
-                <GeolocateControl
-                  position="top-left"
-                  trackUserLocation
-                  onGeolocate={(e) =>
-                    setCurrentLocation(() => ({
-                      lat: e.coords.latitude,
-                      lng: e.coords.longitude,
-                    }))
-                  }
-                />
-              </ReactMapGL> */}
-
               {mapLoaded && (
                 <UserMap
-                rideStatus={rideStatus}
                   currentCoors={currentLocation}
                   source={source}
                   destination={destination}
                   directionData={directionData}
-                  driverCoors={driverCoors}
+                  // driverCoors={driverCoors}
                 />
               )}
 

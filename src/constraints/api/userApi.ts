@@ -4,5 +4,8 @@ export default{
   isUserExistWithMail:'/getuserbymail',
   logout:"/logout",
   loginWithMobile:'/login',
-  listCabs:"/list-cabs"
+  listCabs:"/list-cabs",
+  getQuickRide:"/getQuickRideData",
+  payments:'/payment',
+  getKey:'/getkey'
 }

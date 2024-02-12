@@ -4,6 +4,8 @@ import React from "react";
 export interface CustomWindow extends Window {
   recaptchaVerifier?: RecaptchaVerifier;
   confirmationResult?: ConfirmationResult;
+  Razorpay?:any
+  
 }
 
 export interface OtpInputProps {

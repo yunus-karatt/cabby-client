@@ -9,19 +9,38 @@ import {
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { rootState } from "../../interface/user/userInterface";
+import Spinner from "../common/Spinner";
 
 export const SelectDestination = ({
   socketIO,
   distance,
-  duration
+  duration,
+  setSearching,
+  searching,
+  isScheduled,
+  setisScheduled,
+  setShowCabs,
+  selectedDateTime,
+  setSelectedDateTime
 }: {
-  socketIO: Socket|null;
-  distance: number;
-  duration: string;
+  socketIO: Socket | null;
+  distance?: number;
+  duration?: string;
+  setSearching: React.Dispatch<React.SetStateAction<boolean>>;
+  searching: boolean;
+  isScheduled?: boolean;
+  setisScheduled?: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowCabs?: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedDateTime?:string;
+  setSelectedDateTime?:React.Dispatch<React.SetStateAction<string>>
 }) => {
   const dispatch = useDispatch();
 
   const userId = useSelector((state: rootState) => state.userAuth.userInfo._id);
+
+  const currentDate = new Date().toISOString().split("T")[0];
+  const currentTime = new Date().toTimeString().slice(0, 5);
+  const minDateTime = `${currentDate}T${currentTime}`;
 
   const [sourceL, setSource] = useState<{
     placeName: string;
@@ -49,16 +68,13 @@ export const SelectDestination = ({
     { placeName: string; lat: number; long: number }[]
   >([]);
 
-
   const getAddressList = async () => {
     try {
       if (
         (sourceL && sourceL.placeName) ||
         (destinationL && destinationL.placeName)
       ) {
-        const query = sourceChange
-          ? sourceL.placeName
-          : destinationL.placeName;
+        const query = sourceChange ? sourceL.placeName : destinationL.placeName;
         const res = await axios.get(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json`,
           {
@@ -95,6 +111,7 @@ export const SelectDestination = ({
     dispatch(setSourceCoordinates({ latitude, longitude, placeName }));
     setSourceChange(false);
   };
+
   const onDestinationAddressClick = (
     placeName: string,
     latitude: number,
@@ -111,20 +128,47 @@ export const SelectDestination = ({
       toast.error("Please select Locations");
       return;
     }
-    if (sourceL.latitude == destinationL.latitude && sourceL.longitude == destinationL.longitude) {
+    if (
+      sourceL.latitude == destinationL.latitude &&
+      sourceL.longitude == destinationL.longitude
+    ) {
       toast.error("Please check you selected locations");
       return;
     }
-    socketIO?.emit("getNearByDrivers", {
-      source:sourceL,
-      destination:destinationL,
-      duration,
-      distance,
-      userId,
-    });
-    
+    if (isScheduled) {
+      if(!selectedDateTime){
+        toast.error('Please select a Date')
+      }
+      if (selectedDateTime) {
+        const selectedDateTimeObj = new Date(selectedDateTime);
+        const currentDateTimeObj = new Date();
+        if (selectedDateTimeObj <= currentDateTimeObj) {
+          toast.error("Please select a future date and time");
+          return;
+        }
+        console.log('scheduled')
+        setShowCabs && setShowCabs(true);
+        setSearching(false)
+      }
+    } else {
+      setSearching(true);
+      socketIO?.emit("getNearByDrivers", {
+        source: sourceL,
+        destination: destinationL,
+        duration,
+        distance,
+        userId,
+      });
+    }
   };
 
+  const handleTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (e.target.value === "schedule") setisScheduled && setisScheduled(true);
+    else setisScheduled && setisScheduled(false);
+  };
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedDateTime&&  setSelectedDateTime(e.target.value);
+  };
   useEffect(() => {
     const delay = setTimeout(() => {
       getAddressList();
@@ -210,14 +254,26 @@ export const SelectDestination = ({
         name="pickup-time"
         className=" rounded-md bg-secondary p-3 "
         id=""
+        defaultValue="now"
+        onChange={(e) => handleTimeChange(e)}
       >
-        <option value=""> Pickup Now</option>
+        <option value="now"> Pickup Now</option>
         <option value="schedule">Schedule Time</option>
       </select>
+      {isScheduled && (
+        <input
+          className="w-full bg-secondary p-3 rounded-md"
+          type="datetime-local"
+          value={selectedDateTime}
+          min={minDateTime}
+          onChange={(e) => handleDateChange(e)}
+        />
+      )}
       <button
         onClick={handleSearch}
-        className="bg-primary text-white p-3 rounded-md"
+        className="bg-primary text-white p-3 rounded-md flex justify-center gap-x-3"
       >
+        {searching && <Spinner />}
         Search
       </button>
     </div>
