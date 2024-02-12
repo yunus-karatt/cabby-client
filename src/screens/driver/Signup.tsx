@@ -19,11 +19,11 @@ const Signup = () => {
     lastName: "",
     email: "",
     mobile: number,
-    cityData: {
-      placeName: "",
-      latitude: number,
-      longitude: number,
-    },
+    // cityData: {
+    //   placeName: "",
+    //   latitude: 0,
+    //   longitude: 0,
+    // },
   });
   const [errors, setErrors] = useState({
     firstName: "",
@@ -112,8 +112,24 @@ const Signup = () => {
       return;
     }
     try {
-      setFormData((prev) => ({ ...prev, cityData }));
-      const driver = await driverAxios.post(driverApi.register, formData);
+      // setFormData((prev) => ({
+      //   ...prev,
+      //   cityData: {
+      //     latitude: cityData.latitude,
+      //     longitude: cityData.longitude,
+      //     placeName: cityData.placeName,
+      //   },
+      // }));
+      const updatedFormData = {
+        ...formData,
+        cityData: {
+          latitude: cityData.latitude,
+          longitude: cityData.longitude,
+          placeName: cityData.placeName,
+        },
+      };
+      console.log({ formData, cityData });
+      const driver = await driverAxios.post(driverApi.register, updatedFormData);
       dispatch(setDriverCredentials(driver.data));
       // const { token } = driver.data;
       // localStorage.setItem("driverToken", token);
@@ -208,7 +224,7 @@ const Signup = () => {
             <div className="relative">
               <label htmlFor="city">City</label>
               <input
-              autoComplete="off"
+                autoComplete="off"
                 value={cityData?.placeName}
                 onChange={(e) => handleCity(e)}
                 name="city"

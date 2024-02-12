@@ -46,15 +46,24 @@ const ListCabs = ({
     }
     if(scheduledRide){
       socketIO?.emit('requestScheduledRide',{
-        source,
-        destination,
-        selectedCabId,
+        
+        sourceCoordinates:{
+          latitude:source.latitude,
+          longitude:source.longitude
+        },
+        destinationCoordinates:{
+          latitude:destination.latitude,
+          longitude:destination.longitude
+        },
+        sourceLocation:source.placeName,
+        destinationLocation:destination.placeName,
+        cabId:selectedCabId,
         duration,
         distance,
-        amount,
+        price:amount,
         userId,
         rideId,
-        selectedDateTime
+        pickUpDate:selectedDateTime
       })
     }else{
       socketIO?.emit("getRequestForRide", {
@@ -67,9 +76,9 @@ const ListCabs = ({
         userId,
         rideId,
       });
+      setLoaderFetchDriver(() => true);
     }
     
-    setLoaderFetchDriver(() => true);
   };
 
   useEffect(() => {

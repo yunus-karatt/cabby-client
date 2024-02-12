@@ -158,18 +158,29 @@ const DriverHeader = () => {
         setRideRequestPop(true);
       }
     );
+    socketIO.on('scheduledRideRequest',data=>{
+      if(driverInfo.id===data.driver._id){
+        setRideData(data.savedRide)
+        setRideRequestPop(true)
+      }
+    })
   }
 
   const accepetRideRequest = async () => {
     const driverCoordinates: { latitude: number; longitude: number } =
       await getLiveCoordinates();
     setRideRequestPop(false);
-    socketIO?.emit("approveRide", {
-      ...rideData,
-      driverId: driverInfo.id,
-      driverCoordinates,
-    });
-    navigate("/driver/current-ride", { state: rideData });
+    if(rideData?.pickUpDate){
+      socketIO?.emit('scheduledRideRequestResponse',{status:'Accepted',driverId:driverInfo.id})
+    }else{
+
+      socketIO?.emit("approveRide", {
+        ...rideData,
+        driverId: driverInfo.id,
+        driverCoordinates,
+      });
+      navigate("/driver/current-ride", { state: rideData });
+    }
   };
 
   const rejectRideRequest = (timeout = false) => {

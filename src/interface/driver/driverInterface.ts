@@ -61,4 +61,5 @@ export interface RideData {
   duration: number;
   date:Date,
   driverId?:string
+  pickUpDate?:string
 }
