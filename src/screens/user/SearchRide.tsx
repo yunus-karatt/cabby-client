@@ -136,7 +136,7 @@ const SearchRide = () => {
               searching={isSearchingForAvailableCabs}
               setSearching={setIsSearchingForAvailableCabs}
               socketIO={socketIO}
-              duration={(directionData?.routes[0].duration / 60).toFixed(2)}
+              duration={(directionData?.routes[0].duration / 3600).toFixed(2)}
               distance={parseFloat(
                 (directionData?.routes[0].distance / 1000).toFixed(2)
               )}
@@ -152,7 +152,7 @@ const SearchRide = () => {
               <ListCabs
                 rideId={rideId}
                 socketIO={socketIO}
-                duration={(directionData.routes[0].duration / 60).toFixed(2)}
+                duration={(directionData.routes[0].duration / 3600).toFixed(2)}
                 distance={parseFloat(
                   (directionData?.routes[0].distance / 1000).toFixed(2)
                 )}
@@ -186,7 +186,7 @@ const SearchRide = () => {
                       </span>
                       Duration:
                       <span className="font-bold">
-                        {(directionData.routes[0].duration / 60).toFixed(2)} Min
+                        {(directionData.routes[0].duration / 3600).toFixed(2)} hours
                       </span>
                     </h2>
                   </div>

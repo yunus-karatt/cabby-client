@@ -12,13 +12,25 @@ const RideRequestPopup = ({
   rejectRideRequest: Function;
 }) => {
   const [counter, setCounter] = useState<number>(15);
+  const [formattedDate, setFormattedDate] = useState<string>();
+  const [formattedTime, setFormattedTime] = useState<string>();
+  const handleRejection = () => {
+    rejectRideRequest();
+  };
+  const handleRideAccept = () => {
+    acceptRideRequest();
+  };
 
-  const handleRejection=()=>{
-    rejectRideRequest()
-  }
-  const handleRideAccept=()=>{
-    acceptRideRequest()
-  }
+  useEffect(() => {
+    if (rideData.pickUpDate) {
+      const date = new Date(rideData.pickUpDate);
+
+      const formattedDate = date.toLocaleDateString("en-IN");
+      setFormattedDate(formattedDate);
+      const formattedTime = date.toLocaleTimeString("en-IN");
+      setFormattedTime(formattedTime);
+    }
+  }, []);
 
   useEffect(() => {
     const timer =
@@ -27,20 +39,20 @@ const RideRequestPopup = ({
         setCounter((prev) => prev - 1);
       }, 1000);
 
-      if(counter===0){
-        rejectRideRequest(true)
-      }
+    if (counter === 0) {
+      rejectRideRequest(true);
+    }
 
-      return ()=>{
-        if(timer)
-        clearInterval(timer)}
+    return () => {
+      if (timer) clearInterval(timer);
+    };
   }, [counter]);
 
   return (
     <div className="p-3 py-8 w-[400px] min-h-[500px] bg-white absolute z-50 left-[50%] top-[50%] -translate-x-[50%] -translate-y-[50%]">
       <div className="flex justify-between items-center">
-      <h1 className="font-bold text-xl">New Ride Request</h1>
-      <ProgressRing counter={counter}/>
+        <h1 className="font-bold text-xl">New Ride Request</h1>
+        <ProgressRing counter={counter} />
       </div>
       <hr className="mt-3" />
       <div className="flex p-3  gap-y-2 w-full justify-between">
@@ -63,9 +75,15 @@ const RideRequestPopup = ({
           </div>
           <div className="w-[45%] flex flex-col gap-y-2">
             <p className="text-text-secondary opacity-80">Amount</p>
-            <p className="font-bold">{rideData?.price}</p>
+            <p className="font-bold">₹ {rideData?.price}</p>
           </div>
-          
+          {rideData.pickUpDate && (
+            <div className="w-[45%] flex flex-col gap-y-2">
+              <p className="text-text-secondary opacity-80">pickup Time</p>
+              <p className="font-bold">{formattedDate}</p>
+              <p className="font-bold">{formattedTime}</p>
+            </div>
+          )}
         </div>
       </div>
 
