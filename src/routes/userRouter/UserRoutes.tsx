@@ -8,6 +8,8 @@ import Signup from "../../screens/user/Signup";
 import PageNotFound from "../../components/common/PageNotFound";
 import SearchRide from "../../screens/user/SearchRide";
 import UserPrivateRoutes from "./UserPrivateRoutes";
+import CurrentRide from "../../screens/user/CurrentRide";
+import Payments from "../../screens/user/Payments";
 
 const UserRoutes: React.FC = () => {
   return (
@@ -19,6 +21,8 @@ const UserRoutes: React.FC = () => {
       <Route path="/signup" element={<Signup />} />
       <Route path="" element={<UserPrivateRoutes />}>
         <Route path="/search-ride" element={<SearchRide />} />
+        <Route path="/current-ride" element={<CurrentRide />} />
+        <Route path="/payment" element={<Payments />} />
       </Route>
       <Route path="/*" element={<PageNotFound />} />
     </Routes>

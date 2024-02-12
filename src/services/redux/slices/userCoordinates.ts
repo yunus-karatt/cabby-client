@@ -3,13 +3,13 @@ import { RouteCoordinates } from "../../../interface/user/userInterface";
 
 const initialState: RouteCoordinates = {
   source: {
-    long: 0,
-    lat: 0,
+    longitude: 0,
+    latitude: 0,
     placeName: "",
   },
   destination: {
-    long: 0,
-    lat: 0,
+    longitude: 0,
+    latitude: 0,
     placeName: "",
   },
 };

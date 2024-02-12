@@ -2,7 +2,7 @@ import { CabInteface } from "../common/common";
 import { DriverData } from "../driver/driverInterface";
 
 export interface Admin {
-  _id: string;
+  id: string;
   name: string;
   mobile: string;
 }

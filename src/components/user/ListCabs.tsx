@@ -16,6 +16,8 @@ const ListCabs = ({
   availableCabs,
   rideId,
   setLoaderFetchDriver,
+  scheduledRide,
+  selectedDateTime,
 }: {
   rideId: string;
   socketIO: Socket | null;
@@ -23,6 +25,9 @@ const ListCabs = ({
   duration: string;
   availableCabs: string[];
   setLoaderFetchDriver: React.Dispatch<SetStateAction<boolean>>;
+  scheduledRide?:boolean
+  selectedDateTime?:string
+
 }) => {
   const [cabs, setCabs] = useState<CabInteface[]>([]);
   const [imageLoading, setImageLoading] = useState<boolean>(true);
@@ -39,28 +44,50 @@ const ListCabs = ({
       toast.error("Please Select a Cab");
       return;
     }
-    socketIO?.emit("getRequestForRide", {
-      source,
-      destination,
-      selectedCabId,
-      duration,
-      distance,
-      amount,
-      userId,
-      rideId,
-    });
+    if(scheduledRide){
+      socketIO?.emit('requestScheduledRide',{
+        source,
+        destination,
+        selectedCabId,
+        duration,
+        distance,
+        amount,
+        userId,
+        rideId,
+        selectedDateTime
+      })
+    }else{
+      socketIO?.emit("getRequestForRide", {
+        source,
+        destination,
+        selectedCabId,
+        duration,
+        distance,
+        amount,
+        userId,
+        rideId,
+      });
+    }
+    
     setLoaderFetchDriver(() => true);
   };
 
   useEffect(() => {
     const fetchData = async () => {
       const res = await userAxios.get(userApi.listCabs);
-      setCabs(() => {
-        return res.data.filter((obj: CabInteface) =>
-          availableCabs.includes(obj._id)
-        );
-      });
-      setLoading(false);
+      if(scheduledRide){
+        setCabs(()=>res.data)
+
+        setLoading(false)
+      }else{
+        
+        setCabs(() => {
+          return res.data.filter((obj: CabInteface) =>
+            availableCabs.includes(obj._id)
+          );
+        });
+        setLoading(false);
+      }
     };
     fetchData();
   }, []);

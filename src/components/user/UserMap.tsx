@@ -24,7 +24,7 @@ const UserMap = ({
   directionData?: DirectionsApiResponse;
   currentRideData?: CurrentRideData;
   driverCoors?: { latitude: number; longitude: number };
-  rideStatus: null | "started" | "ended";
+  rideStatus?: 'initiated' | "started" | "ended";
 }) => {
   const mapRef = useRef<MapRef | null>(null);
 
@@ -92,38 +92,24 @@ const UserMap = ({
               longitude={currentCoors?.longitude}
             />
           )}
-
-          {source?.latitude && source.longitude && !driverCoors?.latitude && (
+          {
+            driverCoors && 
+            <Marker latitude={driverCoors.latitude} longitude={driverCoors.longitude} />
+          }
+          {
+            !rideStatus && source && 
             <Marker latitude={source.latitude} longitude={source.longitude} />
-          )}
-          {destination?.latitude &&
-            destination.longitude &&
-            !driverCoors?.latitude && (
-              <Marker
-                latitude={destination.latitude}
-                longitude={destination.longitude}
-              />
-            )}
-          {driverCoors?.latitude && driverCoors.longitude && (
-            <Marker
-              latitude={driverCoors.latitude}
-              longitude={driverCoors.longitude}
-            />
-          )}
-          {destination?.latitude && source?.longitude && (
-            <Marker
-              latitude={
-                rideStatus === "started" && rideStatus != null
-                  ? destination?.latitude
-                  : source?.latitude
-              }
-              longitude={
-                rideStatus != null && rideStatus === "started"
-                  ? destination?.longitude
-                  : source?.longitude
-              }
-            />
-          )}
+          }
+          {
+            !rideStatus && destination && 
+            <Marker latitude={destination.latitude} longitude={destination.longitude} />
+          }
+          {source && rideStatus==='initiated' &&
+          <Marker latitude={source.latitude} longitude={source.longitude} />
+          }
+          {destination && rideStatus==='started' &&
+          <Marker latitude={destination.latitude} longitude={destination.longitude} />
+          }
           {directionData?.routes && (
             <MapboxRoute
               coordinates={directionData?.routes[0]?.geometry?.coordinates}

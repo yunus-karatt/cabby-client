@@ -30,6 +30,7 @@ const DriverHeader = () => {
   const navigate = useNavigate();
 
   const handleActive = async () => {
+    console.log({driverInfo})
     const res = await driverAxios.put(driverApi.changeAvailability, {
       id: driverInfo.id,
     });

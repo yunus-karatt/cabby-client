@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import {
   DirectionsApiResponse,
-  Geometry,
+  
   Maneuver,
   Steps,
 } from "../../interface/common/common";
@@ -113,18 +113,18 @@ const CurrentRide = () => {
     }
   };
 
-  const isDriverWithinManeuver = (maneuver: {
-    latitude: number;
-    longitude: number;
-  }): boolean => {
-    // const threshold = 0.0001;
-    if (driverCoords)
-      return (
-        Math.abs(driverCoords?.latitude - maneuver.latitude) === 0 &&
-        Math.abs(driverCoords?.longitude - maneuver.longitude) === 0
-      );
-    else return false;
-  };
+  // const isDriverWithinManeuver = (maneuver: {
+  //   latitude: number;
+  //   longitude: number;
+  // }): boolean => {
+  //   // const threshold = 0.0001;
+  //   if (driverCoords)
+  //     return (
+  //       Math.abs(driverCoords?.latitude - maneuver.latitude) === 0 &&
+  //       Math.abs(driverCoords?.longitude - maneuver.longitude) === 0
+  //     );
+  //   else return false;
+  // };
 
   // GET CURRENT COORDS
   useEffect(() => {
@@ -144,8 +144,14 @@ const CurrentRide = () => {
   }, []);
 
   useEffect(() => {
+    // emiting reached at pickup point
     if (pickup && currentStep && currentStep[0].distance == 0) {
       setIsAtPickupPoint(() => true);
+      socketIO?.emit('driverReachedAtPickup',{rideId:rideData._id,userId:rideData.userId,driverId:rideData.driverId})
+    }
+    // emiting reached at destinaion
+    if(!pickup && currentStep && currentStep[0].distance==0){
+      socketIO?.emit('reachedDestination',{rideId:rideData._id,userId:rideData.userId,driverId:rideData.driverId})
     }
   }, [currentStep]);
 
@@ -211,7 +217,7 @@ const CurrentRide = () => {
     }
     if (driverDummyLocation.current) {
       if (driverDummyLocation?.current?.length > 0) {
-        intervalRef.current = setInterval(manipulateDriverCoors, 300);
+        intervalRef.current = setInterval(manipulateDriverCoors, 1000);
 
         return () => clearInterval(intervalRef.current);
       }

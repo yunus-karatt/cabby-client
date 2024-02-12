@@ -20,12 +20,18 @@ export interface DriverAuthSlice {
   driverInfo: Driver;
 }
 
+export interface UserCurrentRideData{
+  currentRideData:CurrentRideData
+}
+
 export interface rootState {
   userAuth: UserAuthSlice;
   adminAuth: AdminAuthSlice;
   driverAuth: DriverAuthSlice;
   routeCoordinates: RouteCoordinates;
-  driverSocket:SocketState
+  driverSocket:SocketState,
+  userSocket:SocketState,
+  userCurrentRide:UserCurrentRideData
 }
 
 
