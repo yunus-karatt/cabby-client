@@ -10,6 +10,7 @@ import SearchRide from "../../screens/user/SearchRide";
 import UserPrivateRoutes from "./UserPrivateRoutes";
 import CurrentRide from "../../screens/user/CurrentRide";
 import Payments from "../../screens/user/Payments";
+import ScheduledRides from "../../screens/user/ScheduledRides";
 
 const UserRoutes: React.FC = () => {
   return (
@@ -23,6 +24,7 @@ const UserRoutes: React.FC = () => {
         <Route path="/search-ride" element={<SearchRide />} />
         <Route path="/current-ride" element={<CurrentRide />} />
         <Route path="/payment" element={<Payments />} />
+        <Route path="/scheduled-rides" element={<ScheduledRides />} />
       </Route>
       <Route path="/*" element={<PageNotFound />} />
     </Routes>

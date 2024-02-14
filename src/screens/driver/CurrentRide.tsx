@@ -1,4 +1,4 @@
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import CurrentRideInfo from "../../components/driver/CurrentRideInfo";
 import DriverHeader from "../../components/driver/DriverHeader";
 import Map from "../../components/driver/Map";
@@ -25,6 +25,8 @@ interface Position {
 const CurrentRide = () => {
   const location = useLocation();
   const rideData: RideData = location.state;
+  
+  const {driverInfo} = useSelector((state:rootState)=>state.driverAuth)
 
   const {socketIO}=useSelector((state:rootState)=>state.driverSocket)
 
@@ -46,6 +48,10 @@ const CurrentRide = () => {
   const [currentStep, setCurrentStep] = useState<Steps[]>();
   const [isAtPickupPoint, setIsAtPickupPoint] = useState<boolean>(false);
   const [otpVerified, setOtpVerified] = useState<boolean>(false);
+  const [rideFinished,setRideFinished]=useState<boolean>(false)
+
+  const navigate=useNavigate()
+
 
   // manipulate driver coordinates
   const manipulateDriverCoors = () => {
@@ -77,6 +83,7 @@ const CurrentRide = () => {
     }));
     socketIO?.emit('driverLiveLocation',{pos,rideId:rideData._id,userId:rideData.userId})
   };
+
   // finding current step to direction
   const findCurrentManeuver = () => {
     if (maneuver) {
@@ -151,7 +158,10 @@ const CurrentRide = () => {
     }
     // emiting reached at destinaion
     if(!pickup && currentStep && currentStep[0].distance==0){
-      socketIO?.emit('reachedDestination',{rideId:rideData._id,userId:rideData.userId,driverId:rideData.driverId})
+      setRideFinished(true)
+      navigate('/driver')
+      console.log(rideData)
+      socketIO?.emit('reachedDestination',{rideId:rideData._id,userId:rideData.userId,driverId:driverInfo.id})
     }
   }, [currentStep]);
 
@@ -241,6 +251,7 @@ const CurrentRide = () => {
             // isAtPickupPoint
             setOtpVerified={setOtpVerified}
             otpVerified={otpVerified}
+            rideFinished={rideFinished}
           />
         </div>
         {!mapLoading && driverCoords && (

@@ -10,5 +10,8 @@ export default{
   postRejectionReason:'/rejection-reason',
   goOffline:'/go-offline',
   getUserData:'/get-user',
-  verifyOTP:'/verify-ride-otp'
+  verifyOTP:'/verify-ride-otp',
+  listScheduledRide:'/list-scheduledride',
+  getSheduledRideByRideId:'/get-scheduledride/',
+  generateScheduledRideOTP:'/generate-scheduleride-otp'
 }

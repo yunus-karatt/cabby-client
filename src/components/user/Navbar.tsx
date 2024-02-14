@@ -133,7 +133,7 @@ const Navbar = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 justify-evenly items-center h-2/4">
               <div className="flex items-center border-b-2 border-black hover:border-primary hover:text-primary p-5">
                 <h2 className=" me-5 ">
-                  <Link to="/authland">Ride With Cabby</Link>
+                  <Link  to={userInfo?'/search-ride':'/authland'}>Ride With Cabby</Link>
                 </h2>
                 <ArrowRight />
               </div>
@@ -147,6 +147,10 @@ const Navbar = () => {
                 <>
                   <div className="flex items-center border-b-2 border-black hover:border-primary hover:text-primary p-5">
                     <h2 className=" me-5 ">Manage Account</h2>
+                    <ArrowRight />
+                  </div>
+                  <div className="flex items-center border-b-2 border-black hover:border-primary hover:text-primary p-5">
+                    <h2 className=" me-5 "><Link to='/scheduled-rides'> Scheduled Rides</Link></h2>
                     <ArrowRight />
                   </div>
                   <div

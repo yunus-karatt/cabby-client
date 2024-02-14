@@ -89,3 +89,25 @@ export interface DirectionsApiResponse {
     weight_name: string;
   }[];
 }
+export interface ScheduledRideInterface {
+  driverId?: string;
+  userId: string;
+  sourceCoordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  destinationCoordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  sourceLocation: string;
+  destinationLocation: string;
+  distance: number;
+  price: number;
+  pickUpDate:Date;
+  feedback?: string;
+  rating?: number;
+  duration:number;
+  cabId:string;
+  _id:string
+}

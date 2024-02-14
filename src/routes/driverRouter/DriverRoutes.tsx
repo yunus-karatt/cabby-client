@@ -7,19 +7,20 @@ import VehicleInput from "../../screens/driver/VehicleInput";
 import DriverPrivateRoutes from "./DriverPrivateRoutes";
 import DriverPublicRoute from "./DriverPublicRoute";
 import CurrentRide from "../../screens/driver/CurrentRide";
+import ScheduledRideList from "../../screens/driver/ScheduledRideList";
 
 const DriverRoutes: React.FC = () => {
   return (
     <Routes>
       <Route path="" element={<DriverPublicRoute />}>
-
-      <Route path="/authland" element={<DriverAuthLand />} />
+        <Route path="/authland" element={<DriverAuthLand />} />
       </Route>
       <Route path="/signup" element={<Signup />} />
       <Route path="/vehicle-registration" element={<VehicleInput />} />
       <Route path="" element={<DriverPrivateRoutes />}>
         <Route index element={<DriverDashboard />} />
         <Route path="/current-ride" element={<CurrentRide />} />
+        <Route path="/list-scheduledride" element={<ScheduledRideList />} />
       </Route>
     </Routes>
   );

@@ -16,14 +16,16 @@ const CurrentRideInfo = ({
   pickup,
   isAtPickupPoint,
   setOtpVerified,
-  otpVerified
+  otpVerified,
+  rideFinished
 }: {
   rideData: RideData;
   distance?: string;
   pickup: boolean;
   isAtPickupPoint: boolean;
   setOtpVerified: React.Dispatch<React.SetStateAction<boolean>>
-  otpVerified:boolean
+  otpVerified:boolean;
+  rideFinished?:boolean;
 }) => {
   const [user, setUser] = useState<{
     firstName: string;
@@ -43,7 +45,6 @@ const CurrentRideInfo = ({
 
 
   const handleCancelSubmission = async () => {
-    console.log("function called");
     console.log({ socketIO }, "here");
     socketIO?.emit("cancelRideBydriver", { hell: "hai" });
   };
@@ -93,8 +94,8 @@ const CurrentRideInfo = ({
     <>
       <div className="p-5 px-8 flex md:flex-col items-center flex-row gap-8">
         <div className="flex flex-col gap-y-3">
-          <h1 className="font-bold md:text-3xl">
-            {otpVerified ? (<>
+          {!rideFinished ?<h1 className="font-bold md:text-3xl">
+            {  otpVerified ? (<>
             
               Ride in Progress..
               <br />
@@ -104,7 +105,8 @@ const CurrentRideInfo = ({
               ? distance + " " + "km away"
               : "Waiting for the Rider"
             )}
-          </h1>
+            
+          </h1>:<h1 className="font-bold md:text-3xl">Reached Destination</h1>}
           <p className="text-text-secondary opacity-80">
             Pickup {user?.firstName} {user?.lastName}
           </p>
