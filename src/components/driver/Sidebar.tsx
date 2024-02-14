@@ -1,15 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useSidebarContext } from "../../context/SidebarContext";
 import {
-  BookDown,
   CalendarCheck,
   FileClock,
-  FileText,
   IndianRupee,
   LayoutDashboard,
-  Newspaper,
   Star,
-  User,
   UserCog,
 } from "lucide-react";
 import { ElementType } from "react";
@@ -17,6 +13,11 @@ import { PageHeaderFirstSection } from "./DriverHeader";
 
 const SideBar = () => {
   const { isLargeOpen, isSmallOpen, close } = useSidebarContext();
+  const location=useLocation()
+  const isActive = (url: string): boolean => {
+    return location.pathname === url;
+  };
+ 
   return (
     <>
       <aside
@@ -24,7 +25,8 @@ const SideBar = () => {
           isLargeOpen ? "lg:hidden" : "lg:flex"
         }`}
       >
-        <SmallSidebarItem Icon={LayoutDashboard} title="Dashboard" url="/" />
+        <SmallSidebarItem Icon={LayoutDashboard} title="Dashboard" url="/driver" />
+        <SmallSidebarItem Icon={CalendarCheck} title="Scheduled" url="/driver/list-scheduledride" />
         <SmallSidebarItem Icon={FileClock} title="RideHistory" url="/" />
         <SmallSidebarItem Icon={IndianRupee} title="Earnings" url="/" />
         <SmallSidebarItem Icon={Star} title="Feedback" url="/" />
@@ -46,7 +48,9 @@ const SideBar = () => {
         </div>
         <div className="h-[100vh]">
 
-        <LargeSidebarItem isActive Icon={LayoutDashboard} title="Dashboard" url="/admin" />
+        <LargeSidebarItem isActive={isActive("/driver")} Icon={LayoutDashboard} title="Dashboard" url="/driver" />
+        <hr />
+        <LargeSidebarItem isActive={isActive("/driver/list-scheduledride")} Icon={CalendarCheck} title="Scheduled Rides" url="/driver/list-scheduledride" />
         <hr />
         <LargeSidebarItem Icon={FileClock} title="Ride History" url="/" />
         <hr />

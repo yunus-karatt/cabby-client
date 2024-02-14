@@ -53,7 +53,7 @@ const Home: React.FC = () => {
             </p>
             <Link
               to="/driver/authland"
-              className="bg-primary text-white p-3 rounded-lg w-2/4"
+              className="bg-primary text-white p-3 rounded-lg w-2/4 text-center"
             >
               Get Started
             </Link>

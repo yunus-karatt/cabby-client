@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { rootState } from "../../interface/user/userInterface";
 import { toast } from "react-toastify";
 import Loader from "../common/Loader";
+import { useNavigate } from "react-router";
 
 const ListCabs = ({
   socketIO,
@@ -39,6 +40,8 @@ const ListCabs = ({
   const userId = useSelector((state: rootState) => state.userAuth.userInfo._id);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const navigate=useNavigate()
+
   const sendRideRequest = async () => {
     if (!selectedCabId) {
       toast.error("Please Select a Cab");
@@ -65,6 +68,8 @@ const ListCabs = ({
         rideId,
         pickUpDate:selectedDateTime
       })
+      navigate('/search-ride')
+      toast.success('Your Ride scheduled')
     }else{
       socketIO?.emit("getRequestForRide", {
         source,

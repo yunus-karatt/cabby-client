@@ -171,7 +171,7 @@ const DriverHeader = () => {
       await getLiveCoordinates();
     setRideRequestPop(false);
     if(rideData?.pickUpDate){
-      socketIO?.emit('scheduledRideRequestResponse',{status:'Accepted',driverId:driverInfo.id})
+      socketIO?.emit('scheduledRideRequestResponse',{status:'ACCEPTED',driverId:driverInfo.id})
     }else{
 
       socketIO?.emit("approveRide", {
@@ -191,7 +191,12 @@ const DriverHeader = () => {
     if (timeout) {
       setInputPop(true);
     }
-    socketIO?.emit("rejectRide", { ...rideData });
+    if(rideData?.pickUpDate){
+      socketIO?.emit('scheduledRideRequestResponse',{status:'REJECTED',driverId:driverInfo.id})
+    }else{
+
+      socketIO?.emit("rejectRide", { ...rideData });
+    }
   };
 
   return (

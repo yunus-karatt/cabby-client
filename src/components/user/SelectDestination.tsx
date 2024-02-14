@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { rootState } from "../../interface/user/userInterface";
 import Spinner from "../common/Spinner";
+import { LocateFixed } from "lucide-react";
 
 export const SelectDestination = ({
   socketIO,
@@ -21,7 +22,7 @@ export const SelectDestination = ({
   setisScheduled,
   setShowCabs,
   selectedDateTime,
-  setSelectedDateTime
+  setSelectedDateTime,
 }: {
   socketIO: Socket | null;
   distance?: number;
@@ -31,8 +32,8 @@ export const SelectDestination = ({
   isScheduled?: boolean;
   setisScheduled?: React.Dispatch<React.SetStateAction<boolean>>;
   setShowCabs?: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedDateTime?:string;
-  setSelectedDateTime?:React.Dispatch<React.SetStateAction<string>>
+  selectedDateTime?: string;
+  setSelectedDateTime?: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const dispatch = useDispatch();
 
@@ -42,6 +43,10 @@ export const SelectDestination = ({
   const currentTime = new Date().toTimeString().slice(0, 5);
   const minDateTime = `${currentDate}T${currentTime}`;
 
+  const [currentCoors, setCurrentCoors] = useState({
+    latitude: 0,
+    longitude: 0,
+  });
   const [sourceL, setSource] = useState<{
     placeName: string;
     latitude: number;
@@ -136,8 +141,8 @@ export const SelectDestination = ({
       return;
     }
     if (isScheduled) {
-      if(!selectedDateTime){
-        toast.error('Please select a Date')
+      if (!selectedDateTime) {
+        toast.error("Please select a Date");
       }
       if (selectedDateTime) {
         const selectedDateTimeObj = new Date(selectedDateTime);
@@ -146,9 +151,8 @@ export const SelectDestination = ({
           toast.error("Please select a future date and time");
           return;
         }
-        console.log('scheduled')
         setShowCabs && setShowCabs(true);
-        setSearching(false)
+        setSearching(false);
       }
     } else {
       setSearching(true);
@@ -161,13 +165,34 @@ export const SelectDestination = ({
       });
     }
   };
+  const getUserLocation = () => {
+    navigator.geolocation.getCurrentPosition((pos) => {
+      setCurrentCoors(() => ({
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+      }));
+    });
+  };
+
+  const handleSourceCurrentLocation = async () => {
+    const access_token = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+    getUserLocation();
+    const res = await axios.get(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${currentCoors.longitude},${currentCoors.latitude}.json?access_token=${access_token}&limit=1`
+    );
+    onSourceAddressClick(
+      res.data.features[0]?.place_name,
+      currentCoors.latitude,
+      currentCoors.longitude
+    );
+  };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (e.target.value === "schedule") setisScheduled && setisScheduled(true);
     else setisScheduled && setisScheduled(false);
   };
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedDateTime&&  setSelectedDateTime(e.target.value);
+    setSelectedDateTime && setSelectedDateTime(e.target.value);
   };
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -180,16 +205,22 @@ export const SelectDestination = ({
     <div className=" bg-white h-fit rounded-lg flex flex-col p-5 gap-y-3">
       <h1 className="font-bold  text-xl">Get A Ride</h1>
       <div className="relative">
-        <input
-          className="w-full bg-secondary rounded-md p-3 "
-          type="text"
-          placeholder={`Pickup location`}
-          value={sourceL?.placeName}
-          onChange={(e) => {
-            setSourceChange(true);
-            setSource((prev) => ({ ...prev, placeName: e.target.value }));
-          }}
-        />
+        <div className="flex items-center bg-secondary rounded p-1">
+          <input
+            className="w-full bg-secondary rounded-md p-3 outline-none"
+            type="text"
+            placeholder={`Pickup location`}
+            value={sourceL?.placeName}
+            onChange={(e) => {
+              setSourceChange(true);
+              setSource((prev) => ({ ...prev, placeName: e.target.value }));
+            }}
+          />
+          <LocateFixed
+            className="cursor-pointer"
+            onClick={handleSourceCurrentLocation}
+          />
+        </div>
         {addressList.length > 0 && sourceChange && (
           <div className="z-50 absolute bg-white border border-secondary py-4 rounded-md border-t-0 flex flex-col gap-y-2">
             {addressList.map((data, index) => {
@@ -213,16 +244,22 @@ export const SelectDestination = ({
         )}
       </div>
       <div className="relative">
-        <input
-          className="bg-secondary rounded-md p-3 w-full"
-          type="text"
-          placeholder={`Dropoff location`}
-          value={destinationL.placeName}
-          onChange={(e) => {
-            setDestinationChange(true);
-            setDestination((prev) => ({ ...prev, placeName: e.target.value }));
-          }}
-        />
+        <div className="flex items-center bg-secondary rounded p-1">
+          <input
+            className="bg-secondary rounded-md p-3 w-full outline-none"
+            type="text"
+            placeholder={`Dropoff location`}
+            value={destinationL.placeName}
+            onChange={(e) => {
+              setDestinationChange(true);
+              setDestination((prev) => ({
+                ...prev,
+                placeName: e.target.value,
+              }));
+            }}
+          />
+          <LocateFixed className="cursor-pointer" />
+        </div>
         {addressList.length > 0 && destinationChange && (
           <div className="absolute bg-white border border-secondary py-4 rounded-md border-t-0 flex flex-col gap-y-2">
             {addressList.map((data, index) => {

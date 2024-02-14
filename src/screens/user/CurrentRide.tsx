@@ -8,10 +8,11 @@ import {
 } from "../../interface/common/common";
 import axios from "axios";
 import { rootState } from "../../interface/user/userInterface";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getDistance } from "../../utils/utils";
 import UserMap from "../../components/user/UserMap";
 import { useNavigate } from "react-router";
+import { clearUserCurrentRideData } from "../../services/redux/slices/userCurrentRideSlice";
 
 const CurrentRide = () => {
   const { userInfo } = useSelector((state: rootState) => state.userAuth);
@@ -21,13 +22,14 @@ const CurrentRide = () => {
   const { socketIO } = useSelector((state: rootState) => state.userSocket);
 
     const navigate=useNavigate()
-
+    const dispatch=useDispatch()
   const [pickupReached, setPickupReached] = useState(false);
 
 
   useEffect(() => {
     console.log({ currentRideData });
   }, []);
+
   useEffect(() => {
     socketIO?.on(
       "updateDriverCoordsForDriver",
@@ -56,6 +58,7 @@ const CurrentRide = () => {
     socketIO?.on('reachedDestination',(data)=>{
       if(data.userId===userInfo._id){
         setRideStatus(()=>'ended')
+        dispatch(clearUserCurrentRideData())
         data.quickRide=true
         navigate('/payment',{state:data})
       }

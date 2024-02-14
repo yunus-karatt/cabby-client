@@ -1,6 +1,6 @@
 import  { useEffect, useState } from "react";
 import Navbar from "../../components/user/Navbar";
-import {  useLocation } from "react-router-dom";
+import {  useLocation, useNavigate } from "react-router-dom";
 import { userAxios } from "../../constraints/axios/userAxios";
 import userApi from "../../constraints/api/userApi";
 import { RideData } from "../../interface/driver/driverInterface";
@@ -17,9 +17,13 @@ const Payments = () => {
     driverId: string;
     quickRide: true;
   } = location.state;
+
   const [rideData, setRideData] = useState<RideData | null>(null);
 
   const { userInfo } = useSelector((state: rootState) => state.userAuth);
+
+  const navigate=useNavigate()
+
   useEffect(() => {
     const fetchRideData = async () => {
       console.log(data.rideId);
@@ -30,7 +34,6 @@ const Payments = () => {
   }, []);
 
   const paymentHandler = async () => {
-    console.log("called");
     try {
       const {
         data: { key },
@@ -42,7 +45,6 @@ const Payments = () => {
         amount: rideData?.price,
         rideId:rideData?._id
       });
-      console.log({data},{order})
       const options = {
         key,
         amount: order.amount,
@@ -51,7 +53,13 @@ const Payments = () => {
         description: "Go anywhere with cabby",
         image: "https://avatars.githubusercontent.com/u/25058652?v=4",
         order_id: order.id,
-        callback_url: `${baseURL}/paymentCapture`,
+        // callback_url: `${baseURL}/paymentCapture`,
+        handler:async function (response:any){
+          const res=await userAxios.post('/paymentCapture',response)
+          if(res.data){
+            navigate('/')
+          }
+        },
         prefill: {
           name: userInfo.firstName,
           email: userInfo.email,
