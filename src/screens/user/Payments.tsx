@@ -10,13 +10,14 @@ import { CustomWindow } from "../../interface/common/common";
 
 const Payments = () => {
   const location = useLocation();
-  const baseURL = import.meta.env.VITE_USER_BASE_URL;
-  const data: {
-    rideId: string;
-    userId: string;
-    driverId: string;
-    quickRide: true;
-  } = location.state;
+  // const data: {
+  //   rideId: string;
+  //   userId: string;
+  //   driverId: string;
+  //   quickRide: true;
+  // } = location.state;
+  const searchParams = new URLSearchParams(location.search);
+  const rideId = searchParams.get("rideId");
 
   const [rideData, setRideData] = useState<RideData | null>(null);
 
@@ -25,9 +26,10 @@ const Payments = () => {
   const navigate=useNavigate()
 
   useEffect(() => {
+    
     const fetchRideData = async () => {
-      console.log(data.rideId);
-      const res = await userAxios.get(`${userApi.getQuickRide}/${data.rideId}`);
+      console.log({rideId});
+      const res = await userAxios.get(`${userApi.getQuickRide}/${rideId}`);
       setRideData(() => res.data);
     };
     fetchRideData();
@@ -83,14 +85,14 @@ const Payments = () => {
     <div className="w-[100vw] h-[100vh] overflow-x-hidden">
       <Navbar />
       <div className="bg-secondary h-full w-full flex justify-center items-center">
-        <div className="w-[40%] h-[80%] bg-white flex flex-col items-center gap-y-10 p-5 rounded-md shadow-md">
+        <div className="w-[40%] min-h-[80%] bg-white flex flex-col items-center p-5 rounded-md shadow-md">
           <div>
             <h3 className="font-bold text-3xl">Payment Details</h3>
           </div>
-          <div className="w-[80%] h-[70%] flex flex-col justify-evenly">
+          <div className="w-[80%] h-[70%] flex flex-col justify-center mt-5 gap-y-6">
             <div className="flex justify-between">
               <p className="text-xl font-bold w-[50%]">Total Amount</p>
-              <p className="text-xl font-bold ">{rideData?.price}</p>
+              <p className="text-xl font-bold">{rideData?.price}</p>
             </div>
             <div className="flex justify-between">
               <p className="text-xl font-bold w-[50%]">Distance</p>

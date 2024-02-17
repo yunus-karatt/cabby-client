@@ -131,7 +131,7 @@ const RequestPopup = ({ driver, setPopup,setRequest }: RequestPopupProps) => {
               </div>
             </div>
             <hr />
-            <div className="flex flex-col p-3 ms-10 gap-y-2 min-w-[82%]">
+            <div className="flex flex-col p-3 ms-10 gap-y-2 min-w-[82%] h-auto">
               <p className="font-bold text-xl text-center md:text-start">
                 Documents
               </p>
@@ -170,7 +170,7 @@ const RequestPopup = ({ driver, setPopup,setRequest }: RequestPopupProps) => {
                 </div>
               </div>
             </div>
-            <div className="flex justify-center gap-x-5">
+            <div className="flex justify-center gap-x-5 mt-8">
               <button onClick={rejectDriver} className="w-[180px] py-2 px-6 rounded-lg border border-primary text-primary">
                 Decline
               </button>

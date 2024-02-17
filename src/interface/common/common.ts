@@ -1,5 +1,6 @@
 import { ConfirmationResult, RecaptchaVerifier } from "firebase/auth";
 import React from "react";
+import { DriverData } from "../driver/driverInterface";
 
 export interface CustomWindow extends Window {
   recaptchaVerifier?: RecaptchaVerifier;
@@ -109,5 +110,17 @@ export interface ScheduledRideInterface {
   rating?: number;
   duration:number;
   cabId:string;
-  _id:string
+  _id:string;
+  otp?:string;
+  driverCoordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  status: string;
+  date: Date;
+
+
+}
+export interface ScheduledRideInterfaceWithDriver extends ScheduledRideInterface{
+  driverData:DriverData
 }

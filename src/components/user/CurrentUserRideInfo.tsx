@@ -1,40 +1,46 @@
 import { CurrentRideData } from "../../interface/user/userInterface";
 import avathar from "../../assets/avatar 1.png";
-import { Circle, MessageSquare } from "lucide-react";
+import { Circle, MessageSquare, MessageSquareText } from "lucide-react";
 import { useEffect, useState } from "react";
+import Chat from "../common/Chat";
 
 const CurrentUserRideInfo = ({
   rideData,
   rideStatus,
-  distance
+  distance,
 }: {
-  rideStatus: "started" | "ended" | 'initiated';
+  rideStatus: "started" | "ended" | "initiated";
   rideData?: CurrentRideData;
   distance?: string;
-
 }) => {
-  useEffect(()=>console.log({rideData}),[])
-  const otpString = rideData?.otp.toString();
+  useEffect(() => console.log({ rideData }), []);
+
+  const otpString = rideData?.otp?.toString();
   const otpArray = otpString?.split("");
 
   const [showOTP, setShowOTP] = useState<boolean>(true);
-
+  const [showChat,setShowChat]=useState<boolean>(false)
   useEffect(() => {
     if (rideStatus === "started") {
       setShowOTP(() => false);
     }
-  
   }, [rideStatus]);
 
   return (
-    <div className=" bg-white h-[100%] overflow-y-scroll overflow-x-hidden rounded-lg flex flex-col p-5 gap-y-3">
-      <div className={`p-2`}>
-        <div className="flex flex-col gap-y-3 my-3">
-          <p className="font-bold text-2xl">{rideStatus==='initiated' && 'Your Driver is'}
-          {rideStatus==='started' &&'Ride In Progress'}
-          {rideStatus==='ended' && 'You are reached you destination'}
-          </p>
-        <p className="font-bold text-xl">{distance} Km away</p>
+    <div className="bg-white h-[100%] overflow-y-scroll overflow-x-hidden rounded-lg flex flex-col p-5 gap-y-3">
+     {!showChat && <div className={`p-2`}>
+        <div className="flex justify-between items-center">
+          <div className="flex flex-col gap-y-3 my-3">
+            <p className="font-bold md:text-3xl">
+              {rideStatus === "initiated" && "Your Driver Is"}
+              {rideStatus === "started" && "Ride In Progress"}
+              {rideStatus === "ended" && "You are reached you destination"}
+            </p>
+            <p className="font-bold text-xl">{distance} Km away</p>
+          </div>
+          <MessageSquareText
+          onClick={()=>setShowChat((prev)=>!prev)}
+          size={60} className="cursor-pointer" />
         </div>
         <p className="font-semibold text-xl">Driver</p>
         <div className="border-2 border-black p-3 mt-5 flex justify-between items-center">
@@ -61,8 +67,7 @@ const CurrentUserRideInfo = ({
           </p>
           <p className="text-xl font-bold">₹{rideData?.price}</p>
         </div>
-        <div>
-        </div>
+        <div></div>
         <div className="hidden md:block">
           <div className="mt-5">
             <p className="font-bold text-2xl">Pickup</p>
@@ -101,7 +106,14 @@ const CurrentUserRideInfo = ({
             </div>
           </div>
         )}
-      </div>
+      </div>}
+      {
+        showChat && <div className="">
+          
+          <Chat setShowChat={setShowChat} />
+        </div>
+      }
+      
     </div>
   );
 };

@@ -7,5 +7,6 @@ export default{
   listCabs:"/list-cabs",
   getQuickRide:"/getQuickRideData",
   payments:'/payment',
-  getKey:'/getkey'
+  getKey:'/getkey',
+  getScheduledRideByUserId:'/get-scheduledride'
 }

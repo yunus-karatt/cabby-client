@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import avatar from "../../assets/avatar 1.png";
 import { DriverData } from "../../interface/driver/driverInterface";
 const DriverDetails = ({ driverData }: { driverData: DriverData }) => {
+  
   const [license, setLicense] = useState<boolean>(true);
   const [showRc,setShowRc]=useState<boolean>(false)
-  useEffect(()=>{console.log(driverData)},[])
 
   return (
     <div className="bg-white mx-2 rounded-md p-10 ">

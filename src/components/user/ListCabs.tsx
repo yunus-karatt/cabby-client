@@ -68,7 +68,7 @@ const ListCabs = ({
         rideId,
         pickUpDate:selectedDateTime
       })
-      navigate('/search-ride')
+      navigate('/scheduled-rides')
       toast.success('Your Ride scheduled')
     }else{
       socketIO?.emit("getRequestForRide", {
