@@ -61,12 +61,12 @@
 //   userCurrentRide.actions;
 // export default userCurrentRide.reducer;
 
-
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CurrentRideData } from "../../../interface/user/userInterface";
+import { ScheduledRideInterfaceWithDriver } from "../../../interface/common/common";
 
 interface CurrentRideDataState {
-  currentRideData: CurrentRideData | null;
+  currentRideData: CurrentRideData | ScheduledRideInterfaceWithDriver | null;
 }
 
 const initialState: CurrentRideDataState = {
@@ -77,7 +77,8 @@ const userCurrentRide = createSlice({
   name: "userCurrentRide",
   initialState,
   reducers: {
-    setUserCurrentRideData: (state, action: PayloadAction<CurrentRideData>) => {
+    setUserCurrentRideData: (state, action: PayloadAction<CurrentRideData| ScheduledRideInterfaceWithDriver>) => {
+      console.log(action.payload,'payload')
       state.currentRideData = action.payload;
     },
     clearUserCurrentRideData: (state) => {

@@ -1,7 +1,7 @@
-import { Circle } from "lucide-react";
+import { Circle, MessageSquareText } from "lucide-react";
 import avatar from "../../assets/avatar 1.png";
 import { RideData } from "../../interface/driver/driverInterface";
-import {  useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { driverAxios } from "../../constraints/axios/driverAxios";
 import driverApi from "../../constraints/api/driverApi";
 import ConfirmPopup from "../common/ConfirmPopup";
@@ -17,15 +17,15 @@ const CurrentRideInfo = ({
   isAtPickupPoint,
   setOtpVerified,
   otpVerified,
-  rideFinished
+  rideFinished,
 }: {
   rideData: RideData;
   distance?: string;
   pickup: boolean;
   isAtPickupPoint: boolean;
-  setOtpVerified: React.Dispatch<React.SetStateAction<boolean>>
-  otpVerified:boolean;
-  rideFinished?:boolean;
+  setOtpVerified: React.Dispatch<React.SetStateAction<boolean>>;
+  otpVerified: boolean;
+  rideFinished?: boolean;
 }) => {
   const [user, setUser] = useState<{
     firstName: string;
@@ -36,20 +36,19 @@ const CurrentRideInfo = ({
   const [cancelReason, setCancelReason] = useState<string>("");
   const { socketIO } = useSelector((state: rootState) => state.driverSocket);
   const otpRef = useRef<HTMLInputElement>(null);
-  const [otpInput, setOtpInput] = useState<number|null>(null);
+  const [otpInput, setOtpInput] = useState<number | null>(null);
   const [otpError, setOtpError] = useState({ isError: false, message: "" });
 
   const handleCancelRide = async () => {
     setIsConfirmPopup(() => true);
   };
 
-
   const handleCancelSubmission = async () => {
     console.log({ socketIO }, "here");
     socketIO?.emit("cancelRideBydriver", { hell: "hai" });
   };
 
-  const verifyOTP = async() => {
+  const verifyOTP = async () => {
     const stringOTP = otpInput?.toString();
     if (stringOTP?.length != 6) {
       setOtpError(() => ({
@@ -62,16 +61,22 @@ const CurrentRideInfo = ({
       setOtpError(() => ({ isError: true, message: "Please Enter OTP" }));
       return;
     }
-    try{
-      const res=await driverAxios.post(driverApi.verifyOTP,{rideId:rideData._id,OTP:otpInput})
-      if(res.data){
-        setOtpVerified(true)
-        socketIO?.emit('otpVerified',{userId:rideData.userId,rideId:rideData._id})
-      }else{
-        setOtpError(()=>({isError:true,message:"OTP doesn't match"}))
+    try {
+      const res = await driverAxios.post(driverApi.verifyOTP, {
+        rideId: rideData._id,
+        OTP: otpInput,
+      });
+      if (res.data) {
+        setOtpVerified(true);
+        socketIO?.emit("otpVerified", {
+          userId: rideData.userId,
+          rideId: rideData._id,
+        });
+      } else {
+        setOtpError(() => ({ isError: true, message: "OTP doesn't match" }));
       }
-    }catch(error){
-      console.error(error)
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -93,23 +98,32 @@ const CurrentRideInfo = ({
   return (
     <>
       <div className="p-5 px-8 flex md:flex-col items-center flex-row gap-8">
-        <div className="flex flex-col gap-y-3">
-          {!rideFinished ?<h1 className="font-bold md:text-3xl">
-            {  otpVerified ? (<>
-            
-              Ride in Progress..
-              <br />
-              {distance}KM
-            </>):
-            (!isAtPickupPoint
-              ? distance + " " + "km away"
-              : "Waiting for the Rider"
+        <div className="flex  justify-between">
+          <div className="flex flex-col gap-y-3">
+            {!rideFinished ? (
+              <h1 className="font-bold md:text-3xl">
+                {otpVerified ? (
+                  <>
+                    Ride in Progress..
+                    <br />
+                    {distance}KM
+                  </>
+                ) : !isAtPickupPoint ? (
+                  distance + " " + "km away"
+                ) : (
+                  "Waiting for the Rider"
+                )}
+              </h1>
+            ) : (
+              <h1 className="font-bold md:text-3xl">Reached Destination</h1>
             )}
-            
-          </h1>:<h1 className="font-bold md:text-3xl">Reached Destination</h1>}
-          <p className="text-text-secondary opacity-80">
-            Pickup {user?.firstName} {user?.lastName}
-          </p>
+            <p className="text-text-secondary opacity-80">
+              Pickup {user?.firstName} {user?.lastName}
+            </p>
+          </div>
+          <div>
+            <MessageSquareText size={50}  className="cursor-pointer" />
+          </div>
         </div>
         <div className="hidden md:flex items-center  gap-x-6">
           <img src={avatar} alt="" />
@@ -141,24 +155,26 @@ const CurrentRideInfo = ({
               <p>{rideData.destinationLocation}</p>
             </div>
           </div>
-          {isAtPickupPoint && !otpVerified &&(
+          {isAtPickupPoint && !otpVerified && (
             <div className="flex flex-col gap-y-3">
               <p className="font-bold text-lg">OTP</p>
               <input
                 onChange={(e) => {
-                  setOtpInput(e.target.valueAsNumber)
-                  setOtpError(()=>({isError:false,message:''}))
+                  setOtpInput(e.target.valueAsNumber);
+                  setOtpError(() => ({ isError: false, message: "" }));
                 }}
                 ref={otpRef}
-                value={otpInput?otpInput:''}
+                value={otpInput ? otpInput : ""}
                 type="number"
                 name="otpInput"
                 id="otpInput"
                 className="border-2 w-full p-2 rounded"
               />
-              {otpError.isError && 
-              <p className="text-danger font-semibold font-md">{otpError.message} </p>
-              }
+              {otpError.isError && (
+                <p className="text-danger font-semibold font-md">
+                  {otpError.message}{" "}
+                </p>
+              )}
               <button
                 onClick={verifyOTP}
                 className="bg-primary mt-3 rounded-md w-full p-1 text-white"

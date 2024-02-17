@@ -1,4 +1,4 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../../components/user/Navbar";
 import CurrentUserRideInfo from "../../components/user/CurrentUserRideInfo";
 import {
@@ -15,20 +15,17 @@ import { useNavigate } from "react-router";
 import { clearUserCurrentRideData } from "../../services/redux/slices/userCurrentRideSlice";
 
 const CurrentRide = () => {
+
   const { userInfo } = useSelector((state: rootState) => state.userAuth);
   const { currentRideData } = useSelector(
     (state: rootState) => state.userCurrentRide
   );
   const { socketIO } = useSelector((state: rootState) => state.userSocket);
 
-    const navigate=useNavigate()
-    const dispatch=useDispatch()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [pickupReached, setPickupReached] = useState(false);
-
-
-  useEffect(() => {
-    console.log({ currentRideData });
-  }, []);
 
   useEffect(() => {
     socketIO?.on(
@@ -43,11 +40,14 @@ const CurrentRide = () => {
       }
     );
 
-      socketIO?.on('driverReached',(data: { rideId: string; userId: string ;driverId:string})=>{
-        if(data.userId===userInfo._id){
+    socketIO?.on(
+      "driverReached",
+      (data: { rideId: string; userId: string; driverId: string }) => {
+        if (data.userId === userInfo._id) {
           setPickupReached(true);
         }
-      })
+      }
+    );
 
     socketIO?.on("rideStarted", (data: { rideId: string; userId: string }) => {
       if (data.userId === userInfo._id) {
@@ -55,29 +55,29 @@ const CurrentRide = () => {
       }
     });
 
-    socketIO?.on('reachedDestination',(data)=>{
-      if(data.userId===userInfo._id){
-        setRideStatus(()=>'ended')
-        dispatch(clearUserCurrentRideData())
-        data.quickRide=true
-        navigate('/payment',{state:data})
+    socketIO?.on("reachedDestination", (data) => {
+      if (data.userId === userInfo._id) {
+        setRideStatus(() => "ended");
+        dispatch(clearUserCurrentRideData());
+        data.quickRide = true;
+        navigate(`/payment?rideId=${data.rideId}`);
       }
-    })
+    });
   }, [socketIO]);
-  // const [mapLoaded, setMapLoaded] = useState(false);
+
   const [directionData, setDirectionData] = useState<any>();
-  const { source, destination } = useSelector(
-    (state: rootState) => state.routeCoordinates
-  );
-  // const [currentRideData, setCurrentRideData] =
-  //   useState<CurrentRideData | null>(null);
+
+  // const { source, destination } = useSelector(
+  //   (state: rootState) => state.routeCoordinates
+  // );
+
   const [driverCoors, setDriverCoors] = useState<{
     latitude: number;
     longitude: number;
   }>();
-  const [rideStatus, setRideStatus] = useState<"started" | "ended" | 'initiated'>(
-    "initiated"
-  );
+  const [rideStatus, setRideStatus] = useState<
+    "started" | "ended" | "initiated"
+  >("initiated");
   const [currentManeuver, setCurrentManeuver] = useState<Maneuver | null>(null);
   const [maneuver, setManeuver] = useState<Maneuver[]>();
   const [currentStep, setCurrentStep] = useState<Steps[]>();
@@ -126,7 +126,6 @@ const CurrentRide = () => {
     const res: { data: DirectionsApiResponse } =
       await axios.get(`https://api.mapbox.com/directions/v5/mapbox/driving/${sourceLong},${sourceLat};${desLong},${desLat}?overview=full&geometries=geojson&steps=true
 &access_token=${import.meta.env.VITE_MAPBOX_ACCESS_TOKEN}`);
-    console.log({ res }, "from directionData");
     setDirectionData(() => res.data);
     console.log(res.data);
     setCurrentManeuver(() => res.data.routes[0].legs[0].steps[0].maneuver);
@@ -139,18 +138,15 @@ const CurrentRide = () => {
 
   // getting direction from driver coors to user source
   useEffect(() => {
-    console.log('getDirection called')
     currentRideData &&
       getDirection(
-        currentRideData?.driverCoordinates.latitude,
-        currentRideData?.driverCoordinates.longitude,
-        currentRideData?.sourceCoordinates.latitude,
-        currentRideData?.sourceCoordinates.longitude
+        currentRideData?.driverCoordinates?.latitude,
+        currentRideData?.driverCoordinates?.longitude,
+        currentRideData?.sourceCoordinates?.latitude,
+        currentRideData?.sourceCoordinates?.longitude
       );
     setDriverCoors(() => currentRideData?.driverCoordinates);
   }, [currentRideData]);
-
-
 
   useEffect(() => {
     findCurrentManeuver();
@@ -158,13 +154,12 @@ const CurrentRide = () => {
 
   useEffect(() => {
     if (rideStatus === "started") {
-      console.log('getdirection called')
       if (driverCoors)
         getDirection(
           driverCoors?.latitude,
           driverCoors?.longitude,
-          destination.latitude,
-          destination.longitude
+          currentRideData.destinationCoordinates.latitude,
+          currentRideData.destinationCoordinates.longitude
         );
     }
   }, [rideStatus]);
@@ -179,25 +174,25 @@ const CurrentRide = () => {
 
   useEffect(() => {
     if (pickupReached) {
-      
-      if (Notification.permission === 'granted') {
-        new Notification('Pickup Reached', {
-          body: 'The driver has reached the pickup point.',
+      if (Notification.permission === "granted") {
+        new Notification("Pickup Reached", {
+          body: "The driver has reached the pickup point.",
         });
       } else {
         Notification.requestPermission().then((permission) => {
-          if (permission === 'granted') {
-            new Notification('Pickup Reached', {
-              body: 'The driver has reached the pickup point.',
+          if (permission === "granted") {
+            new Notification("Pickup Reached", {
+              body: "The driver has reached the pickup point.",
             });
           }
         });
       }
     }
   }, [pickupReached]);
+
   return (
     <>
-      <div className={`md:h-[100vh] bg-secondary`}>
+      <div className={`md:h-[100vh] h-lvh bg-secondary`}>
         <Navbar />
         <div className=" bg-secondary w-[100%] h-[100%] flex flex-col md:flex-row gap-x-3 p-6 gap-y-6">
           <div className="md:flex-shrink-0 md:w-1/4">
@@ -209,22 +204,18 @@ const CurrentRide = () => {
               }
             />
           </div>
-          {/* {mapLoaded && ( */}
           <div className="w-full md:h-full h-[300px] bg-white rounded-lg relative">
-            {/* {mapLoaded && ( */}
             <UserMap
               rideStatus={rideStatus}
-              source={source}
-              destination={destination}
+              source={currentRideData?.sourceCoordinates}
+              destination={currentRideData?.destinationCoordinates}
               directionData={directionData}
               driverCoors={driverCoors}
             />
-            {/* )} */}
           </div>
-          {/* )} */}
         </div>
+         
       </div>
-      {/* {loaderFetchDriver && <LoaderFetchDriver />} */}
     </>
   );
 };
