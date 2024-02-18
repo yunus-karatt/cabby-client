@@ -59,7 +59,7 @@ const Payments = () => {
         handler:async function (response:any){
           const res=await userAxios.post('/paymentCapture',response)
           if(res.data){
-            navigate('/')
+            navigate(`/rating?driverId=${rideData?.driverId}`)
           }
         },
         prefill: {
