@@ -240,7 +240,7 @@ const CurrentRide = () => {
     <>
       <DriverHeader />
       <div className="w-full h-[100vh] flex md:flex-row flex-col gap-3 p-2 bg-secondary">
-        <div className="md:w-1/4 w-full bg-white rounded-md overflow-y-scroll">
+        <div className="md:w-1/4 w-full bg-white rounded-md overflow-y-scroll ">
           <CurrentRideInfo
             pickup={pickup}
             rideData={rideData}

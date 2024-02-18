@@ -102,4 +102,5 @@ export interface CurrentRideData {
     latitude: number;
     longitude: number;
   };
+  pickUpDate?:Date
 }
