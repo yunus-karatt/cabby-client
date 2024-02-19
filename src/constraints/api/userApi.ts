@@ -8,5 +8,6 @@ export default{
   getQuickRide:"/getQuickRideData",
   payments:'/payment',
   getKey:'/getkey',
-  getScheduledRideByUserId:'/get-scheduledride'
+  getScheduledRideByUserId:'/get-scheduledride',
+  reviewAndRating:'/review'
 }

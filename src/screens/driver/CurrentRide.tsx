@@ -90,6 +90,7 @@ const CurrentRide = () => {
       const tempMan = [...maneuver];
 
       if (driverCoords) {
+        console.log('findcurrentmanuvaer ',currentManeuver?.location[0],currentManeuver?.location[1])
         if (
           currentManeuver?.location[0] === driverCoords.longitude &&
           currentManeuver.location[1] === driverCoords.latitude
@@ -102,15 +103,18 @@ const CurrentRide = () => {
               );
             }
           );
+          console.log({steps,driverCoords})
           if (steps) setCurrentStep(steps);
           setCurrentManeuver(null);
-        }
+        } 
+
         const distance = getDistance(
           driverCoords?.latitude,
           driverCoords?.longitude,
           maneuver[0]?.location[1],
           maneuver[0]?.location[0]
         );
+          console.log(distance)
         if (distance < 0.1) {
           const shiftedMan = tempMan.shift();
           setManeuver(() => tempMan);
@@ -120,18 +124,7 @@ const CurrentRide = () => {
     }
   };
 
-  // const isDriverWithinManeuver = (maneuver: {
-  //   latitude: number;
-  //   longitude: number;
-  // }): boolean => {
-  //   // const threshold = 0.0001;
-  //   if (driverCoords)
-  //     return (
-  //       Math.abs(driverCoords?.latitude - maneuver.latitude) === 0 &&
-  //       Math.abs(driverCoords?.longitude - maneuver.longitude) === 0
-  //     );
-  //   else return false;
-  // };
+
 
   // GET CURRENT COORDS
   useEffect(() => {
@@ -156,12 +149,18 @@ const CurrentRide = () => {
       setIsAtPickupPoint(() => true);
       socketIO?.emit('driverReachedAtPickup',{rideId:rideData._id,userId:rideData.userId,driverId:rideData.driverId})
     }
+
     // emiting reached at destinaion
-    if(!pickup && currentStep && currentStep[0].distance==0){
+    if(!pickup && currentStep && currentStep[0].distance==0 ){
       setRideFinished(true)
       navigate('/driver')
-      console.log(rideData)
+      console.log('reached destination',rideData)
       socketIO?.emit('reachedDestination',{rideId:rideData._id,userId:rideData.userId,driverId:driverInfo.id})
+    }else{
+      console.log({driverCoords})
+      console.log(currentStep && currentStep[0])
+      console.log('else condition from useeffect currentstep')
+      // console.log(cu)
     }
   }, [currentStep]);
 

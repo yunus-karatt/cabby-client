@@ -18,6 +18,7 @@ const Payments = () => {
   // } = location.state;
   const searchParams = new URLSearchParams(location.search);
   const rideId = searchParams.get("rideId");
+  const isScheduled = searchParams.get("scheduled");
 
   const [rideData, setRideData] = useState<RideData | null>(null);
 
@@ -28,9 +29,10 @@ const Payments = () => {
   useEffect(() => {
     
     const fetchRideData = async () => {
-      console.log({rideId});
-      const res = await userAxios.get(`${userApi.getQuickRide}/${rideId}`);
-      setRideData(() => res.data);
+      if(isScheduled==='false'){
+        const res = await userAxios.get(`${userApi.getQuickRide}/${rideId}`);
+        setRideData(() => res.data);
+      }
     };
     fetchRideData();
   }, []);
@@ -59,7 +61,7 @@ const Payments = () => {
         handler:async function (response:any){
           const res=await userAxios.post('/paymentCapture',response)
           if(res.data){
-            navigate(`/rating?driverId=${rideData?.driverId}`)
+            navigate(`/rating?rideId=${rideData?._id}&scheduled=${isScheduled}`)
           }
         },
         prefill: {
