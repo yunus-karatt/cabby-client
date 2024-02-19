@@ -74,12 +74,15 @@ export const SelectDestination = ({
   >([]);
 
   const getAddressList = async () => {
+    console.log('getAddressList called')
     try {
       if (
         (sourceL && sourceL.placeName) ||
         (destinationL && destinationL.placeName)
       ) {
+        console.log('inside if condition in getaddresslist')
         const query = sourceChange ? sourceL.placeName : destinationL.placeName;
+
         const res = await axios.get(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json`,
           {
@@ -99,7 +102,7 @@ export const SelectDestination = ({
           });
         });
       } else {
-        console.log("no sourceL");
+        console.log("no sourceL");  
       }
     } catch (error) {
       console.log(error);
@@ -176,25 +179,32 @@ export const SelectDestination = ({
 
   const handleSourceCurrentLocation = async () => {
     const access_token = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
-    getUserLocation();
+    // getUserLocation();
     const res = await axios.get(
       `https://api.mapbox.com/geocoding/v5/mapbox.places/${currentCoors.longitude},${currentCoors.latitude}.json?access_token=${access_token}&limit=1`
     );
-    onSourceAddressClick(
-      res.data.features[0]?.place_name,
-      currentCoors.latitude,
-      currentCoors.longitude
-    );
+    // onSourceAddressClick(
+    //   res.data.features[0]?.place_name,
+    //   currentCoors.latitude,
+    //   currentCoors.longitude
+    // );
+    setSourceChange(true)
+    setSource((prev)=>({...prev,placeName:res.data.features[0].place_name}))
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (e.target.value === "schedule") setisScheduled && setisScheduled(true);
     else setisScheduled && setisScheduled(false);
   };
+
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedDateTime && setSelectedDateTime(e.target.value);
   };
+
+  useEffect(()=>{getUserLocation()},[])
+
   useEffect(() => {
+    console.log('useEffect for addresslist called')
     const delay = setTimeout(() => {
       getAddressList();
     }, 1000);
@@ -258,7 +268,7 @@ export const SelectDestination = ({
               }));
             }}
           />
-          <LocateFixed className="cursor-pointer" />
+          {/* <LocateFixed className="cursor-pointer" /> */}
         </div>
         {addressList.length > 0 && destinationChange && (
           <div className="absolute bg-white border border-secondary py-4 rounded-md border-t-0 flex flex-col gap-y-2">

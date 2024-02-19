@@ -60,7 +60,7 @@ const CurrentRide = () => {
         setRideStatus(() => "ended");
         dispatch(clearUserCurrentRideData());
         data.quickRide = true;
-        navigate(`/payment?rideId=${data.rideId}`);
+        navigate(`/payment?rideId=${data.rideId}&scheduled=${currentRideData.pickUpDate ? true :false}`);
       }
     });
   }, [socketIO]);

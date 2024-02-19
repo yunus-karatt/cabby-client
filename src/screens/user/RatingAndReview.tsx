@@ -2,21 +2,67 @@ import { useEffect, useState } from "react";
 import StarRating from "../../components/common/StarRating";
 import Navbar from "../../components/user/Navbar";
 import { toast } from "react-toastify";
+import { RideData } from "../../interface/driver/driverInterface";
+import { userAxios } from "../../constraints/axios/userAxios";
+import userApi from "../../constraints/api/userApi";
+import { useNavigate } from "react-router";
 
 const RatingAndReview = () => {
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
+  const [rideData, setRideData] = useState<RideData | null>(null);
+
+  const navigate=useNavigate()
 
   const searchParams = new URLSearchParams(location.search);
-  const driverId = searchParams.get("driverId");
+  const rideId = searchParams.get("rideId");
+  const isScheduled=searchParams.get('scheduled')
 
-  const handleSubmit = () => {
+  const handleIgnore=async()=>{
+    navigate('/')
+  }
+
+  const handleSubmit = async() => {
     if (!review && !rating) {
       toast.error("Please review your driver");
       return;
     }
-    console.log({ review, rating });
+    let reviewData: {
+      userId?: string;
+      driverId?: string;
+      rating: number;
+      review: string;
+      scheduledRideId?: string; 
+      rideId?: string; 
+    } = {
+      userId: rideData?.userId,
+      driverId: rideData?.driverId,
+      rating,
+      review
+    };
+    if (rideData?.pickUpDate) {
+      reviewData.scheduledRideId = rideData._id;
+    } else {
+      reviewData.rideId = rideData?._id;
+    }
+   const res= await userAxios.post(userApi.reviewAndRating,reviewData)
+   if(res.data){
+    toast.success('Thank you for the valuable feedback')
+    navigate('/')
+   }
   };
+
+  useEffect(() => {
+    
+    const fetchRideData = async () => {
+      if(isScheduled==='false'){
+        console.log({rideId})
+        const res = await userAxios.get(`${userApi.getQuickRide}/${rideId}`);
+        setRideData(() => res.data);
+      }
+    };
+    fetchRideData();
+  }, []);
 
   return (
     <div className="bg-secondary h-lvh">
@@ -46,7 +92,7 @@ const RatingAndReview = () => {
             >
               Submit
             </button>
-            <button className="bg-danger text-white p-3 rounded-md w-28 hover:opacity-90">
+            <button onClick={handleIgnore} className="bg-danger text-white p-3 rounded-md w-28 hover:opacity-90">
               Ignore
             </button>
           </div>
