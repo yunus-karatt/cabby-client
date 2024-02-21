@@ -36,7 +36,6 @@ export interface DriverData {
   __v: number;
   cabModel: {
     cabType: string;
-    
   }[];
 }
 
@@ -59,7 +58,19 @@ export interface RideData {
   feedback?: string;
   rating?: number;
   duration: number;
-  date:Date,
-  driverId?:string
-  pickUpDate?:string
+  date: Date;
+  driverId?: string;
+  pickUpDate?: Date;
+}
+
+export interface DashboardData {
+  completedRide: number;
+  revenue: number;
+  upcomingScheduledRide: number;
+  quickRideGraphData: GraphData[];
+}
+
+export interface GraphData {
+  count: number;
+  date: string;
 }

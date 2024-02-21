@@ -13,5 +13,8 @@ export default{
   verifyOTP:'/verify-ride-otp',
   listScheduledRide:'/list-scheduledride',
   getSheduledRideByRideId:'/get-scheduledride/',
-  generateScheduledRideOTP:'/generate-scheduleride-otp'
+  generateScheduledRideOTP:'/generate-scheduleride-otp',
+  getDashboardData:'/get-dashboarddata',
+  getRideHistory:'/get-ridehistory',
+  getReview:'/get-review'
 }

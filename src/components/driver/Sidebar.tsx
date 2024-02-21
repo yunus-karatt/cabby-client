@@ -27,9 +27,9 @@ const SideBar = () => {
       >
         <SmallSidebarItem Icon={LayoutDashboard} title="Dashboard" url="/driver" />
         <SmallSidebarItem Icon={CalendarCheck} title="Scheduled" url="/driver/list-scheduledride" />
-        <SmallSidebarItem Icon={FileClock} title="RideHistory" url="/" />
-        <SmallSidebarItem Icon={IndianRupee} title="Earnings" url="/" />
-        <SmallSidebarItem Icon={Star} title="Feedback" url="/" />
+        <SmallSidebarItem Icon={FileClock} title="RideHistory" url="/driver/ride-history" />
+        <SmallSidebarItem Icon={IndianRupee} title="Earnings" url="/driver/earnings" />
+        <SmallSidebarItem Icon={Star} title="Feedback" url="/driver/feedbacks" />
         <SmallSidebarItem Icon={UserCog} title="Profile" url="/" />
       </aside>
       {isSmallOpen && (
@@ -52,11 +52,11 @@ const SideBar = () => {
         <hr />
         <LargeSidebarItem isActive={isActive("/driver/list-scheduledride")} Icon={CalendarCheck} title="Scheduled Rides" url="/driver/list-scheduledride" />
         <hr />
-        <LargeSidebarItem Icon={FileClock} title="Ride History" url="/" />
+        <LargeSidebarItem isActive={isActive("/driver/ride-history")} Icon={FileClock} title="Ride History" url="/driver/ride-history" />
         <hr />
-        <LargeSidebarItem Icon={IndianRupee} title="Earnings" url="/" />
+        <LargeSidebarItem isActive={isActive("/driver/earnings")} Icon={IndianRupee} title="Earnings" url="/driver/earnings" />
         <hr />
-        <LargeSidebarItem Icon={Star} title="Feedback and Ratings" url="/" />
+        <LargeSidebarItem isActive={isActive("/driver/feedbacks")} Icon={Star} title="Feedback and Ratings" url="/driver/feedbacks" />
         <hr />
         <LargeSidebarItem Icon={UserCog} title="Profile" url="/" />
         <hr />

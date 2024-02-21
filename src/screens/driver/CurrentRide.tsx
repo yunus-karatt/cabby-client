@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import {
   DirectionsApiResponse,
-  
   Maneuver,
   Steps,
 } from "../../interface/common/common";
@@ -154,11 +153,9 @@ const CurrentRide = () => {
     if(!pickup && currentStep && currentStep[0].distance==0 ){
       setRideFinished(true)
       navigate('/driver')
-      console.log('reached destination',rideData)
-      socketIO?.emit('reachedDestination',{rideId:rideData._id,userId:rideData.userId,driverId:driverInfo.id})
+      const isScheduled=rideData.pickUpDate ? true : false
+      socketIO?.emit('reachedDestination',{rideId:rideData._id,userId:rideData.userId,driverId:driverInfo.id,price:rideData.price,isScheduled})
     }else{
-      console.log({driverCoords})
-      console.log(currentStep && currentStep[0])
       console.log('else condition from useeffect currentstep')
       // console.log(cu)
     }

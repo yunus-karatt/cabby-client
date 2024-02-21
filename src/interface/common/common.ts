@@ -1,12 +1,12 @@
 import { ConfirmationResult, RecaptchaVerifier } from "firebase/auth";
 import React from "react";
 import { DriverData } from "../driver/driverInterface";
+import { UserData } from "../user/userInterface";
 
 export interface CustomWindow extends Window {
   recaptchaVerifier?: RecaptchaVerifier;
   confirmationResult?: ConfirmationResult;
-  Razorpay?:any
-  
+  Razorpay?: any;
 }
 
 export interface OtpInputProps {
@@ -53,13 +53,11 @@ export interface Maneuver {
   location: [number, number];
 }
 
-export interface Steps{
-  
-    distance: number;
-    duration: number;
-    geometry: Geometry;
-    maneuver: Maneuver
-  
+export interface Steps {
+  distance: number;
+  duration: number;
+  geometry: Geometry;
+  maneuver: Maneuver;
 }
 
 export interface DirectionsApiResponse {
@@ -105,27 +103,37 @@ export interface ScheduledRideInterface {
   destinationLocation: string;
   distance: number;
   price: number;
-  pickUpDate:Date;
+  pickUpDate: Date;
   feedback?: string;
   rating?: number;
-  duration:number;
-  cabId:string;
-  _id:string;
-  otp?:string;
+  duration: number;
+  cabId: string;
+  _id: string;
+  otp?: string;
   driverCoordinates: {
     latitude: number;
     longitude: number;
   };
   status: string;
   date: Date;
-
-
 }
-export interface ScheduledRideInterfaceWithDriver extends ScheduledRideInterface{
-  driverData:DriverData
+export interface ScheduledRideInterfaceWithDriver
+  extends ScheduledRideInterface {
+  driverData: DriverData;
 }
 export interface Message {
   sender: string;
   content: string;
   timestamp: Date;
+}
+
+export interface Review {
+  _id: string;
+  rideId: string;
+  scheduledRideId: string;
+  userId: UserData;
+  driverId: string;
+  rating: number;
+  review: string;
+  date: Date;
 }

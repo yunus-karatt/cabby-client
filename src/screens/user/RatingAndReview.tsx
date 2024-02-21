@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import StarRating from "../../components/common/StarRating";
+import StarRating from "../../components/driver/StarRating";
 import Navbar from "../../components/user/Navbar";
 import { toast } from "react-toastify";
 import { RideData } from "../../interface/driver/driverInterface";
