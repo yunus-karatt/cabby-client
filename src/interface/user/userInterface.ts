@@ -46,7 +46,6 @@ export interface UserData {
   lastName: string;
   mobile: string | null;
   updatedAt: string;
-  __v: number;
   _id: string;
 }
 
