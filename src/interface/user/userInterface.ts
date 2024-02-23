@@ -3,7 +3,7 @@ import { Admin } from "../admin/adminInterface";
 import { Driver } from "../driver/driverInterface";
 
 export interface ExistingUser {
-  _id: string;
+  id: string;
   firstName: string;
   lastName: string;
   mobile: string;

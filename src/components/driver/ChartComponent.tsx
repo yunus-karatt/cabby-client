@@ -1,7 +1,8 @@
 import ReactApexChart from "react-apexcharts";
 import { GraphData } from "../../interface/driver/driverInterface";
 
-const ChartComponent = ({ graphData }: { graphData?: GraphData[] }) => {
+const ChartComponent = ({ graphData,isScheduled }: { graphData?: GraphData[],isScheduled?:boolean }) => {
+  
   const today = new Date();
   const lastSevenDays = Array.from({ length: 7 }, (_, index) => {
     const date = new Date(today);
@@ -15,15 +16,14 @@ const ChartComponent = ({ graphData }: { graphData?: GraphData[] }) => {
       count: dataItem ? dataItem.count : 0,
     };
   });
-
   const labels = mergedData.map((data) => data.date);
   const counts = mergedData.map((data) => data.count);
 
-  const chartData:any = {
+  const chartData: any = {
     options: {
       chart: {
         height: 350,
-        type: "line" ,
+        type: "line",
         dropShadow: {
           enabled: true,
           color: "#000",
@@ -47,13 +47,7 @@ const ChartComponent = ({ graphData }: { graphData?: GraphData[] }) => {
         text: "Ride count per day for the last seven days",
         align: "left",
       },
-      // grid: {
-      //   borderColor: "#e7e7e7",
-      //   row: {
-      //     colors: ["#f3f3f3", "transparent"], // takes an array which will be repeated on columns
-      //     opacity: 0.5,
-      //   },
-      // },
+     
       markers: {
         size: 1,
       },
@@ -65,10 +59,10 @@ const ChartComponent = ({ graphData }: { graphData?: GraphData[] }) => {
       },
       yaxis: {
         title: {
-          text: 'Rides'
+          text: `${isScheduled ? "Scheduled Rides" : "Quick Rides"}`,
         },
         min: 0,
-        max: 40
+        max: 40,
       },
       legend: {
         position: "top",
@@ -84,7 +78,7 @@ const ChartComponent = ({ graphData }: { graphData?: GraphData[] }) => {
         data: counts,
       },
     ],
-  }
+  };
   return (
     <div className="bg-white p-4 rounded-lg ">
       <ReactApexChart

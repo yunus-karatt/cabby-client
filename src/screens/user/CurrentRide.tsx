@@ -43,20 +43,20 @@ const CurrentRide = () => {
     socketIO?.on(
       "driverReached",
       (data: { rideId: string; userId: string; driverId: string }) => {
-        if (data.userId === userInfo._id) {
+        if (data.userId === userInfo.id) {
           setPickupReached(true);
         }
       }
     );
 
     socketIO?.on("rideStarted", (data: { rideId: string; userId: string }) => {
-      if (data.userId === userInfo._id) {
+      if (data.userId === userInfo.id) {
         setRideStatus(() => "started");
       }
     });
 
     socketIO?.on("reachedDestination", (data) => {
-      if (data.userId === userInfo._id) {
+      if (data.userId === userInfo.id) {
         setRideStatus(() => "ended");
         dispatch(clearUserCurrentRideData());
         data.quickRide = true;

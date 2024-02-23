@@ -13,8 +13,8 @@ const PriceModelPopup = ({
   preview,
   setNewCab
 }: PriceModelPopupProps) => {
+  
   const [file, setFile] = useState<File | null>(null);
-  // const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     cabType: "",
     maxPersons: "",

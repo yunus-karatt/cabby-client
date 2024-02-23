@@ -2,10 +2,7 @@ import mapboxgl from "mapbox-gl";
 import { useEffect, useRef } from "react";
 import ReactMapGL, { MapRef, Marker, NavigationControl } from "react-map-gl";
 import MapboxRoute from "../user/MapboxRoute";
-// import Markers from "../user/Markers";
 import { DirectionsApiResponse } from "../../interface/common/common";
-import { CurrentRideData } from "../../interface/user/userInterface";
-// import MapboxDirections from "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
@@ -14,7 +11,7 @@ const UserMap = ({
   source,
   destination,
   directionData,
-  currentRideData,
+  // currentRideData,
   driverCoors,
   rideStatus,
 }: {
@@ -22,7 +19,7 @@ const UserMap = ({
   source?: { latitude: number; longitude: number };
   destination?: { latitude: number; longitude: number };
   directionData?: DirectionsApiResponse;
-  currentRideData?: CurrentRideData;
+  // currentRideData?: CurrentRideData;
   driverCoors?: { latitude: number; longitude: number };
   rideStatus?: 'initiated' | "started" | "ended";
 }) => {
@@ -47,20 +44,6 @@ const UserMap = ({
       });
     }
   }, [destination]);
-
-  // set driver position
-  // useEffect(() => {
-  //   if (currentRideData?.driverCoordinates.latitude) {
-  //     mapRef.current?.flyTo({
-  //       center: [
-  //         currentRideData?.driverCoordinates.longitude,
-  //         currentRideData?.driverCoordinates.latitude,
-  //       ],
-  //       duration: 2500,
-  //     });
-
-  //   }
-  // }, [currentRideData]);
 
   // update map with driver live coors
   useEffect(() => {

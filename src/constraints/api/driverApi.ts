@@ -16,5 +16,6 @@ export default{
   generateScheduledRideOTP:'/generate-scheduleride-otp',
   getDashboardData:'/get-dashboarddata',
   getRideHistory:'/get-ridehistory',
-  getReview:'/get-review'
+  getReview:'/get-review',
+  isDriverOnline:'/is-driver-online',
 }

@@ -30,7 +30,7 @@ const SideBar = () => {
         <SmallSidebarItem Icon={FileClock} title="RideHistory" url="/driver/ride-history" />
         <SmallSidebarItem Icon={IndianRupee} title="Earnings" url="/driver/earnings" />
         <SmallSidebarItem Icon={Star} title="Feedback" url="/driver/feedbacks" />
-        <SmallSidebarItem Icon={UserCog} title="Profile" url="/" />
+        <SmallSidebarItem Icon={UserCog} title="Profile" url="/driver/profile" />
       </aside>
       {isSmallOpen && (
         <div
@@ -58,7 +58,7 @@ const SideBar = () => {
         <hr />
         <LargeSidebarItem isActive={isActive("/driver/feedbacks")} Icon={Star} title="Feedback and Ratings" url="/driver/feedbacks" />
         <hr />
-        <LargeSidebarItem Icon={UserCog} title="Profile" url="/" />
+        <LargeSidebarItem isActive={isActive("/driver/profile")} Icon={UserCog} title="Profile" url="/driver/profile" />
         <hr />
         
         </div>

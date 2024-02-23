@@ -6,7 +6,6 @@ import { rootState } from "../../interface/user/userInterface";
 import { driverAxios } from "../../constraints/axios/driverAxios";
 import driverApi from "../../constraints/api/driverApi";
 import { useNavigate } from "react-router";
-import { Driver } from "../../interface/driver/driverInterface";
 import { setDriverCredentials } from "../../services/redux/slices/driverAuthSlice";
 
 const VehicleInput = () => {
@@ -25,18 +24,11 @@ const VehicleInput = () => {
     number: string;
     photo: string;
   } | null>(null);
-  // const [vehiclePhoto1, setVehiclePhot1] = useState<string>("");
-  // const [vehiclePhoto2, setVehiclePhot2] = useState<string>("");
-  // const [vehicleType, setVehicleType] = useState<string>("");
   const [vehicleDetails, setVehicleDetails] = useState({
     imag1: "",
     imag2: "",
     type: "",
   });
-  // const [driver, setDriver] = useState<Driver>(); 
-  // const setVehiclePhot1Function=(state:string)=>{
-  //     setVehiclePhot1(state)
-  // }
   const postDetails = async (url1: string, url2: string, model: string) => {
     console.log(
       vehicleDetails.imag1,

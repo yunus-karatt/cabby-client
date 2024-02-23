@@ -16,6 +16,7 @@ import { setUserCredentials } from "../../services/redux/slices/userAuthSlice";
 import { setAdminCredentials } from "../../services/redux/slices/adminAuthSlice";
 import { setDriverCredentials } from "../../services/redux/slices/driverAuthSlice";
 import Spinner from "../common/Spinner";
+// import { useHistory } from "react-router-dom";
 
 const OtpInputGroup = ({
   number,
@@ -36,6 +37,7 @@ const OtpInputGroup = ({
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  // const history = useHistory();
 
   const [inputValues, setInputValues] = useState({
     input1: "",
@@ -83,43 +85,56 @@ const OtpInputGroup = ({
             if (!data) {
               navigate("/signup", { state: number });
             } else {
-              console.log({ data });
-              dispatch(setUserCredentials(data));
+              try {
+                dispatch(setUserCredentials(data));
+                setIsLoading(true);
+                const res = await userAxios.post(userApi.loginWithMobile, {
+                  mobile: number,
+                });
+                const { token } = res.data;
+                localStorage.setItem("userToken", token);
+                setIsLoading(false);
+                navigate("/");
+              } catch (error) {
+                console.log(error);
+              }
+            }
+          } else if (role === "admin") {
+            try {
+              dispatch(setAdminCredentials(data));
               setIsLoading(true);
-              const res = await userAxios.post(userApi.loginWithMobile, {
+
+              const res = await adminAxios.post(adminApi.login, {
                 mobile: number,
               });
               const { token } = res.data;
-              localStorage.setItem("userToken", token);
               setIsLoading(false);
-              navigate("/");
+              localStorage.setItem("adminToken", token);
+              console.log("hi");
+              // window.location='/admin'
+              // history.push("/admin");
+              navigate("/admin");
+            } catch (error) {
+              console.log(error);
             }
-          } else if (role === "admin") {
-            dispatch(setAdminCredentials(data));
-            setIsLoading(true);
-
-            const res = await adminAxios.post(adminApi.login, {
-              mobile: number,
-            });
-            const { token } = res.data;
-            localStorage.setItem("adminToken", token);
-            setIsLoading(false);
-
-            navigate("/admin");
           } else {
             if (!data) {
               navigate("/driver/signup", { state: number });
             } else {
-              setIsLoading(true);
+              try {
+                setIsLoading(true);
 
-              const res = await driverAxios.post(driverApi.loginWithMobile, {
-                mobile: number,
-              });
-              const { token } = res.data;
-              setIsLoading(false);
-              dispatch(setDriverCredentials(data));
-              localStorage.setItem("driverToken", token);
-              navigate("/driver");
+                const res = await driverAxios.post(driverApi.loginWithMobile, {
+                  mobile: number,
+                });
+                const { token } = res.data;
+                setIsLoading(false);
+                dispatch(setDriverCredentials(data));
+                localStorage.setItem("driverToken", token);
+                navigate("/driver");
+              } catch (error) {
+                console.log(error);
+              }
             }
           }
         })

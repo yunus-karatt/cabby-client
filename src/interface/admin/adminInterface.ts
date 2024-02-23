@@ -17,5 +17,12 @@ export interface PriceModelPopupProps {
 export interface RequestPopupProps {
   driver: DriverData;
   setPopup: React.Dispatch<React.SetStateAction<boolean>>;
-  setRequest:React.Dispatch<React.SetStateAction<DriverData []>>;
+  setRequest: React.Dispatch<React.SetStateAction<DriverData[]>>;
+}
+
+export interface DashboardCount {
+  completedCount: number;
+  cancelledCount: number;
+  activeRides: number;
+  totalRevenue:number;
 }

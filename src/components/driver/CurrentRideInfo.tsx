@@ -9,7 +9,6 @@ import GetInputPop from "../common/GetInputPop";
 import { useSelector } from "react-redux";
 import { rootState } from "../../interface/user/userInterface";
 import Chat from "../common/Chat";
-// import { emitEvent } from "../../utils/socketUtils";
 
 const CurrentRideInfo = ({
   rideData,

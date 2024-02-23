@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import DriverHeader from "../../components/driver/DriverHeader";
 import SideBar from "../../components/driver/Sidebar";
 import { driverAxios } from "../../constraints/axios/driverAxios";
@@ -39,10 +39,10 @@ const Earnings = () => {
           </div>
 
           <div className="bg-white h-[100vh] mx-2 rounded-md p-10 flex justify-center ">
-            <div className="relative overflow-x-auto shadow-md sm:rounded-lg h-fit">
-              {loading ? (
+          {loading ? (
                 <Spinner />
-              ) : (
+              ) : ( <div className="relative overflow-x-auto shadow-md sm:rounded-lg h-fit">
+              
                 <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
                   <thead className="text-xs text-black uppercase bg-secondary ">
                     <tr>
@@ -87,8 +87,8 @@ const Earnings = () => {
                     })}
                   </tbody>
                 </table>
-              )}
             </div>
+              )}
           </div>
         </div>
       </div>

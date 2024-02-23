@@ -6,16 +6,17 @@ const Pagination = ({
   currentPage,
   setCurrentPage,
 }: {
-  totalPage: number |undefined;
+  totalPage: number | undefined;
   currentPage: number;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 }) => {
   const [itPageNum, setItPageNum] = useState<number[]>([]);
 
   useEffect(() => {
-    totalPage&&setItPageNum(() =>
-      Array.from({ length: totalPage }, (_, index) => index + 1)
-    );
+    totalPage &&
+      setItPageNum(() =>
+        Array.from({ length: totalPage }, (_, index) => index + 1)
+      );
   }, []);
   return (
     <nav
@@ -30,7 +31,7 @@ const Pagination = ({
               currentPage == 1 ? "opacity-50 cursor-not-allowed" : ""
             } flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
             disabled={currentPage === 1}
-            onClick={()=>setCurrentPage(currentPage-1)}
+            onClick={() => setCurrentPage(currentPage - 1)}
           >
             <span className="sr-only">Previous</span>
             <ChevronLeft />

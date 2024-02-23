@@ -10,11 +10,9 @@ const CurrentUserRideInfo = ({
   distance,
 }: {
   rideStatus: "started" | "ended" | "initiated";
-  rideData?: CurrentRideData ;
+  rideData?: CurrentRideData;
   distance?: string;
 }) => {
-  useEffect(() => console.log({ rideData }), []);
-
   const otpString = rideData?.otp?.toString();
   const otpArray = otpString?.split("");
 
@@ -115,7 +113,7 @@ const CurrentUserRideInfo = ({
         <div className="">
           {rideData && (
             <Chat
-            isScheduled={rideData?.pickUpDate ? true :false}
+              isScheduled={rideData?.pickUpDate ? true : false}
               setShowChat={setShowChat}
               role="User"
               rideId={rideData?._id}

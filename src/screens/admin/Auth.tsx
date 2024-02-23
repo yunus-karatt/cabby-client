@@ -36,7 +36,7 @@ const Auth: React.FC = () => {
             setUser(confirmationResult);
             (window as CustomWindow).confirmationResult = confirmationResult;
           }
-        );
+        ).catch(error=>{console.log(error)})
       }
     } catch (error) {
       console.error(error);

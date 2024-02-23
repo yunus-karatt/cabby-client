@@ -10,10 +10,13 @@ import Spinner from "../../components/common/Spinner";
 import ChartComponent from "../../components/driver/ChartComponent";
 
 const DriverDashboard = () => {
+
   const [dashboardData, setDashboardData] = useState<DashboardData>();
   const { driverInfo } = useSelector((state: rootState) => state.driverAuth);
   const [dashboardDataLoading, setDashboardDataLoading] =
     useState<boolean>(true);
+
+
   useEffect(() => {
     const fetchData = async () => {
       const res = await driverAxios.get(
@@ -53,7 +56,7 @@ const DriverDashboard = () => {
               {dashboardDataLoading ? (
                 <Spinner />
               ) : (
-                <p>₹ {dashboardData?.revenue}</p>
+                <p>₹ {(dashboardData?.revenue)?.toFixed(2)}</p>
               )}
             </div>
             <div></div>
@@ -61,6 +64,7 @@ const DriverDashboard = () => {
           <div className={`p-5 ${dashboardDataLoading && 'flex justify-center items-center'}`}>
            {dashboardDataLoading? <Spinner /> :<ChartComponent graphData={dashboardData?.quickRideGraphData} />}
           </div>
+          
         </div>
       </div>
     </>

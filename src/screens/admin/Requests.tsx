@@ -115,7 +115,8 @@ const Requests = () => {
           </div>
         </div>
       </div>
-              {popup&& driver && <RequestPopup setRequest={setRequests} setPopup={setPopup} driver={driver}/>}
+              {popup&& driver &&
+               <RequestPopup setRequest={setRequests} setPopup={setPopup} driver={driver}/>}
     </>
   );
 };

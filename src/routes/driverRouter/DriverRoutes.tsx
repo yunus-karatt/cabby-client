@@ -11,6 +11,7 @@ import ScheduledRideList from "../../screens/driver/ScheduledRideList";
 import RideHistory from "../../screens/driver/RideHistory";
 import Earnings from "../../screens/driver/Earnings";
 import Feedbacks from "../../screens/driver/Feedbacks";
+import Profile from "../../screens/driver/Profile";
 
 const DriverRoutes: React.FC = () => {
   return (
@@ -27,6 +28,7 @@ const DriverRoutes: React.FC = () => {
         <Route path="/ride-history" element={<RideHistory />} />
         <Route path="/earnings" element={<Earnings />} />
         <Route path="/feedbacks" element={<Feedbacks />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
     </Routes>
   );

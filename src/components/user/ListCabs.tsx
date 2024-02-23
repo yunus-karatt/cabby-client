@@ -26,9 +26,8 @@ const ListCabs = ({
   duration: string;
   availableCabs: string[];
   setLoaderFetchDriver: React.Dispatch<SetStateAction<boolean>>;
-  scheduledRide?:boolean
-  selectedDateTime?:string
-
+  scheduledRide?: boolean;
+  selectedDateTime?: string;
 }) => {
   const [cabs, setCabs] = useState<CabInteface[]>([]);
   const [imageLoading, setImageLoading] = useState<boolean>(true);
@@ -37,40 +36,39 @@ const ListCabs = ({
   );
   const [selectedCabId, setSelectedCabId] = useState<string | null>(null);
   const [amount, setAmount] = useState<number | null>(null);
-  const userId = useSelector((state: rootState) => state.userAuth.userInfo._id);
+  const userId = useSelector((state: rootState) => state.userAuth.userInfo.id);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
   const sendRideRequest = async () => {
     if (!selectedCabId) {
       toast.error("Please Select a Cab");
       return;
     }
-    if(scheduledRide){
-      socketIO?.emit('requestScheduledRide',{
-        
-        sourceCoordinates:{
-          latitude:source.latitude,
-          longitude:source.longitude
+    if (scheduledRide) {
+      socketIO?.emit("requestScheduledRide", {
+        sourceCoordinates: {
+          latitude: source.latitude,
+          longitude: source.longitude,
         },
-        destinationCoordinates:{
-          latitude:destination.latitude,
-          longitude:destination.longitude
+        destinationCoordinates: {
+          latitude: destination.latitude,
+          longitude: destination.longitude,
         },
-        sourceLocation:source.placeName,
-        destinationLocation:destination.placeName,
-        cabId:selectedCabId,
+        sourceLocation: source.placeName,
+        destinationLocation: destination.placeName,
+        cabId: selectedCabId,
         duration,
         distance,
-        price:amount,
+        price: amount,
         userId,
         rideId,
-        pickUpDate:selectedDateTime
-      })
-      navigate('/scheduled-rides')
-      toast.success('Your Ride scheduled')
-    }else{
+        pickUpDate: selectedDateTime,
+      });
+      navigate("/scheduled-rides");
+      toast.success("Your Ride scheduled");
+    } else {
       socketIO?.emit("getRequestForRide", {
         source,
         destination,
@@ -83,24 +81,26 @@ const ListCabs = ({
       });
       setLoaderFetchDriver(() => true);
     }
-    
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await userAxios.get(userApi.listCabs);
-      if(scheduledRide){
-        setCabs(()=>res.data)
+      try {
+        const res = await userAxios.get(userApi.listCabs);
+        if (scheduledRide) {
+          setCabs(() => res.data);
 
-        setLoading(false)
-      }else{
-        
-        setCabs(() => {
-          return res.data.filter((obj: CabInteface) =>
-            availableCabs.includes(obj._id)
-          );
-        });
-        setLoading(false);
+          setLoading(false);
+        } else {
+          setCabs(() => {
+            return res.data.filter((obj: CabInteface) =>
+              availableCabs.includes(obj._id)
+            );
+          });
+          setLoading(false);
+        }
+      } catch (error) {
+        console.log(error);
       }
     };
     fetchData();

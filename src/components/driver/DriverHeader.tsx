@@ -30,11 +30,14 @@ const DriverHeader = () => {
   const navigate = useNavigate();
 
   const handleActive = async () => {
-    console.log({driverInfo})
-    const res = await driverAxios.put(driverApi.changeAvailability, {
-      id: driverInfo.id,
-    });
-    setActive(() => res.data);
+    try {
+      const res = await driverAxios.put(driverApi.changeAvailability, {
+        id: driverInfo.id,
+      });
+      setActive(() => res.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const toggleDiv = () => {
@@ -42,11 +45,15 @@ const DriverHeader = () => {
   };
 
   const handleLogOut = async () => {
-    const res = await driverAxios.post(
-      `${driverApi.logout}?id=${driverInfo.id}`
-    );
-    if (res.data) {
-      dispatch(logout());
+    try {
+      const res = await driverAxios.post(
+        `${driverApi.logout}?id=${driverInfo.id}`
+      );
+      if (res.data) {
+        dispatch(logout());
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
   const getLiveCoordinates = (): Promise<{
@@ -73,14 +80,18 @@ const DriverHeader = () => {
     source: { lat: number; long: number },
     destination: { lat: number; long: number }
   ) => {
-    const res =
-      await axios.get(`https://api.mapbox.com/directions/v5/mapbox/driving/${
-        source.long
-      },${source.lat};${destination.long},${
-        destination.lat
-      }?overview=full&geometries=geojson
+    try {
+      const res =
+        await axios.get(`https://api.mapbox.com/directions/v5/mapbox/driving/${
+          source.long
+        },${source.lat};${destination.long},${
+          destination.lat
+        }?overview=full&geometries=geojson
 &access_token=${import.meta.env.VITE_MAPBOX_ACCESS_TOKEN}`);
-    return parseFloat((res.data.routes[0].distance / 1000).toFixed(2));
+      return parseFloat((res.data.routes[0].distance / 1000).toFixed(2));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const submitRejection = async () => {
@@ -127,7 +138,6 @@ const DriverHeader = () => {
 
   if (socketIO) {
     socketIO.on("getDriverCoordinates", async (data) => {
-      console.log('getDriverCoordinates',{data});
       const res: { latitude: number; longitude: number } =
         await getLiveCoordinates();
       let coordinates: { lat: number; lng: number } = {
@@ -138,9 +148,8 @@ const DriverHeader = () => {
       const source = { lat: coordinates.lat, long: coordinates.lng };
       const destination = { lat: data.latitude, long: data.longitude };
       const distance = await getDistance(source, destination);
-      console.log({distance})
 
-      if (distance <= 5) {
+      if (distance && distance <= 5) {
         socketIO.emit("driverDistance", {
           distance,
           driverId: driverInfo.id,
@@ -158,22 +167,24 @@ const DriverHeader = () => {
         setRideRequestPop(true);
       }
     );
-    socketIO.on('scheduledRideRequest',data=>{
-      if(driverInfo.id===data.driver._id){
-        setRideData(data.savedRide)
-        setRideRequestPop(true)
+    socketIO.on("scheduledRideRequest", (data) => {
+      if (driverInfo.id === data.driver._id) {
+        setRideData(data.savedRide);
+        setRideRequestPop(true);
       }
-    })
+    });
   }
 
   const accepetRideRequest = async () => {
     const driverCoordinates: { latitude: number; longitude: number } =
       await getLiveCoordinates();
     setRideRequestPop(false);
-    if(rideData?.pickUpDate){
-      socketIO?.emit('scheduledRideRequestResponse',{status:'ACCEPTED',driverId:driverInfo.id})
-    }else{
-
+    if (rideData?.pickUpDate) {
+      socketIO?.emit("scheduledRideRequestResponse", {
+        status: "ACCEPTED",
+        driverId: driverInfo.id,
+      });
+    } else {
       socketIO?.emit("approveRide", {
         ...rideData,
         driverId: driverInfo.id,
@@ -191,13 +202,29 @@ const DriverHeader = () => {
     if (timeout) {
       setInputPop(true);
     }
-    if(rideData?.pickUpDate){
-      socketIO?.emit('scheduledRideRequestResponse',{status:'REJECTED',driverId:driverInfo.id})
-    }else{
-
+    if (rideData?.pickUpDate) {
+      socketIO?.emit("scheduledRideRequestResponse", {
+        status: "REJECTED",
+        driverId: driverInfo.id,
+      });
+    } else {
       socketIO?.emit("rejectRide", { ...rideData });
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await driverAxios.get(
+          `${driverApi.isDriverOnline}/${driverInfo.id}`
+        );
+        setActive(() => res.data?.isAvailable);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -217,6 +244,7 @@ const DriverHeader = () => {
                   onClick={handleActive}
                   value=""
                   className="sr-only peer"
+                  checked={isActive}
                 />
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-primary rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
                 <span className="ms-3 text-sm font-medium text-black hidden md:block">

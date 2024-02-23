@@ -18,11 +18,11 @@ const Navbar = () => {
   };
   const handleLogOut=async()=>{
    const res= await adminAxios.post(adminApi.logout)
-   console.log(res.data)
    if(res.data){
     dispatch(logout())
    }
   }
+
   return (
     <>
       <nav className="flex gap-10 lg:gap-20 justify-between bg-primary text-white  w-full p-2 relative">

@@ -1,4 +1,3 @@
-import React from 'react'
 import { useSelector } from 'react-redux'
 import { rootState } from '../../interface/user/userInterface'
 import { Navigate, Outlet } from 'react-router'

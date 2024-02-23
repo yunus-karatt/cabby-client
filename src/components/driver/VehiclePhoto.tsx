@@ -109,8 +109,12 @@ const VehiclePhoto = ({
 
   useEffect(() => {
     const fetch = async () => {
-      const cab = await driverAxios.get(driverApi.getCabs);
-      setCabType(cab.data);
+      try {
+        const cab = await driverAxios.get(driverApi.getCabs);
+        setCabType(cab.data);
+      } catch (error) {
+        console.log(error);
+      }
     };
     fetch();
   }, []);
@@ -174,7 +178,6 @@ const VehiclePhoto = ({
             })}
         </select>
         <p className="text-danger">{errors.vehicleCat}</p>
-
       </div>
       <div className="flex justify-center items-center shadow-[0px_-8px_20px_0px_rgba(0,0,0,0.08)] p-3">
         <button

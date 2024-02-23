@@ -132,7 +132,7 @@ export interface Review {
   rideId: string;
   scheduledRideId: string;
   userId: UserData;
-  driverId: string;
+  driverId: DriverData;
   rating: number;
   review: string;
   date: Date;

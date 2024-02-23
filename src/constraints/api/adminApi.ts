@@ -12,5 +12,10 @@ export default{
   getDrivers:"/get-drivers",
   blockDriver:"/blockdriver",
   searchUser:"/search-user",
-  searchDriver:"/search-driver"
+  searchDriver:"/search-driver",
+  getDashboardCount:'/dashboard-data',
+  getBookings:'/bookings',
+  getReports:'/reports',
+  getGraphData:'/graph-data',
+  getFeedbacks:'/feedbacks'
 }

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { CancelTokenSource } from "axios";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -37,7 +37,7 @@ export const SelectDestination = ({
 }) => {
   const dispatch = useDispatch();
 
-  const userId = useSelector((state: rootState) => state.userAuth.userInfo._id);
+  const userId = useSelector((state: rootState) => state.userAuth.userInfo.id);
 
   const currentDate = new Date().toISOString().split("T")[0];
   const currentTime = new Date().toTimeString().slice(0, 5);
@@ -73,15 +73,25 @@ export const SelectDestination = ({
     { placeName: string; lat: number; long: number }[]
   >([]);
 
+  const [cancelTokenSource, setCancelTokenSource] =
+    useState<CancelTokenSource | null>(null);
+
   const getAddressList = async () => {
-    console.log('getAddressList called')
+    console.log("getAddressList called");
     try {
       if (
         (sourceL && sourceL.placeName) ||
         (destinationL && destinationL.placeName)
       ) {
-        console.log('inside if condition in getaddresslist')
+        console.log("inside if condition in getaddresslist");
         const query = sourceChange ? sourceL.placeName : destinationL.placeName;
+        if (cancelTokenSource) {
+          // If it exists, cancel the previous request
+          cancelTokenSource.cancel();
+        }
+        // Create a new cancel token source
+        const source = axios.CancelToken.source();
+        setCancelTokenSource(source);
 
         const res = await axios.get(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json`,
@@ -90,6 +100,7 @@ export const SelectDestination = ({
               access_token: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
               country: "in",
             },
+            cancelToken: source.token,
           }
         );
         setAddressList(() => {
@@ -102,7 +113,7 @@ export const SelectDestination = ({
           });
         });
       } else {
-        console.log("no sourceL");  
+        console.log("no sourceL");
       }
     } catch (error) {
       console.log(error);
@@ -170,7 +181,8 @@ export const SelectDestination = ({
   };
   const getUserLocation = () => {
     navigator.geolocation.getCurrentPosition((pos) => {
-      setCurrentCoors(() => ({
+      setCurrentCoors((prev) => ({
+        ...prev,
         latitude: pos.coords.latitude,
         longitude: pos.coords.longitude,
       }));
@@ -178,18 +190,21 @@ export const SelectDestination = ({
   };
 
   const handleSourceCurrentLocation = async () => {
-    const access_token = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
-    // getUserLocation();
-    const res = await axios.get(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${currentCoors.longitude},${currentCoors.latitude}.json?access_token=${access_token}&limit=1`
-    );
-    // onSourceAddressClick(
-    //   res.data.features[0]?.place_name,
-    //   currentCoors.latitude,
-    //   currentCoors.longitude
-    // );
-    setSourceChange(true)
-    setSource((prev)=>({...prev,placeName:res.data.features[0].place_name}))
+    try {
+      const access_token = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+      // getUserLocation();
+      const res = await axios.get(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${currentCoors.longitude},${currentCoors.latitude}.json?access_token=${access_token}&limit=1`
+      );
+
+      setSourceChange(true);
+      setSource((prev) => ({
+        ...prev,
+        placeName: res.data.features[0].place_name,
+      }));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -201,10 +216,11 @@ export const SelectDestination = ({
     setSelectedDateTime && setSelectedDateTime(e.target.value);
   };
 
-  useEffect(()=>{getUserLocation()},[])
+  useEffect(() => {
+    getUserLocation();
+  }, []);
 
   useEffect(() => {
-    console.log('useEffect for addresslist called')
     const delay = setTimeout(() => {
       getAddressList();
     }, 1000);

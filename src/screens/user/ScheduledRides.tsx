@@ -46,7 +46,7 @@ const ScheduledRides = () => {
   useEffect(() => {
     const fetchData = async () => {
       const res = await userAxios.get(
-        `${userApi.getScheduledRideByUserId}/${userInfo._id}`
+        `${userApi.getScheduledRideByUserId}/${userInfo.id}`
       );
       console.log({res})
       setScheduledRideData(() => res.data);
