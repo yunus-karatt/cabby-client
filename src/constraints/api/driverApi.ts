@@ -18,4 +18,6 @@ export default{
   getRideHistory:'/get-ridehistory',
   getReview:'/get-review',
   isDriverOnline:'/is-driver-online',
+  getProfile:'/get-profile',
+  updateProfile:"/update-profile",
 }

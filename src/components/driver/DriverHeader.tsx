@@ -236,7 +236,6 @@ const DriverHeader = () => {
         <div className="items-center flex justify-between mx-8 p-2">
           <PageHeaderFirstSection />
           <div className="flex gap-x-10 items-center">
-            <p className="hidden md:block font-semibold">Notifications</p>
             <div className="bg-white rounded-xl  px-5 py-2 flex ">
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -267,11 +266,8 @@ const DriverHeader = () => {
                   onMouseLeave={() => setShowDiv(false)}
                 >
                   <div className="flex flex-col gap-2 mt-2">
-                    <Link to="" className="flex gap-3">
-                      <Bell /> Notifications
-                    </Link>
-                    <hr />
-                    <Link to="" className="flex gap-3">
+                    
+                    <Link to="/driver/profile" className="flex gap-3">
                       <User /> Profile
                     </Link>
                     <hr />

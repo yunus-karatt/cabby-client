@@ -191,14 +191,14 @@ const CurrentRideInfo = ({
                   </button>
                 </div>
               )}
-              <div className="text-center mt-5">
+              {pickup && <div className="text-center mt-5">
                 <button
                   onClick={handleCancelRide}
                   className="border-2 py-2 px-10 border-danger rounded-full "
                 >
                   Cancel Ride
                 </button>
-              </div>
+              </div>}
             </div>
           </>
         )}

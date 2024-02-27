@@ -72,7 +72,7 @@ const Feedbacks = () => {
                         alt="avthar"
                       />
                       <div>
-                        <p className="font-bold text-xl capitalize">{data.userId.firstName}</p>
+                        <p className="font-bold text-xl capitalize">{data.userId?.firstName}</p>
                         <p className="text-text-secondary"> {formatDateTime(data.date)}</p>
                       </div>
                       <div className="">

@@ -7,12 +7,14 @@ import { useSelector } from "react-redux";
 import { rootState } from "../../interface/user/userInterface";
 import { ScheduledRideInterface } from "../../interface/common/common";
 import { useNavigate } from "react-router";
+import Spinner from "../../components/common/Spinner";
 
 const ScheduledRideList = () => {
   const { driverInfo } = useSelector((state: rootState) => state.driverAuth);
   const [scheduledRideData, setScheduledRideData] = useState<
     ScheduledRideInterface[]
   >([]);
+  const [loading,setLoading]=useState(true)
   const navigate=useNavigate()
 
   const formatDateTime = (dateTimeString: Date) => {
@@ -40,7 +42,7 @@ const ScheduledRideList = () => {
         const res = await driverAxios.get(
           `${driverApi.listScheduledRide}/${driverInfo.id}`
         );
-        console.log({ res });
+        setLoading(false)
         setScheduledRideData(() => res.data);
       } catch (error) {
         console.log(error);
@@ -60,7 +62,7 @@ const ScheduledRideList = () => {
             </div>
 
             <div className="bg-white h-[100vh] mx-2 rounded-md p-10 flex justify-center ">
-              <div className="relative overflow-x-auto shadow-md sm:rounded-lg h-fit">
+              {loading ? <Spinner />: <div className="relative overflow-x-auto shadow-md sm:rounded-lg h-fit">
                 <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
                   <thead className="text-xs text-black uppercase bg-secondary ">
                     <tr>
@@ -116,7 +118,7 @@ const ScheduledRideList = () => {
                       })}
                   </tbody>
                 </table>
-              </div>
+              </div>}
             </div>
           </div>
         </div>
